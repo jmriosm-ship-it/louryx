@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { STORE } from '../config'
+import TikTokIcon from '../components/TikTokIcon'
 
 export function About() {
   return (
@@ -13,7 +14,12 @@ export function About() {
         <div><h4>Cercanía</h4><p>Te asesoramos personalmente por WhatsApp.</p></div>
         <div><h4>Confianza</h4><p>Pagas cuando coordinamos contigo, sin sorpresas.</p></div>
       </div>
-      <Link className="btn" to="/catalogo">Explorar catálogo</Link>
+      <div className="about-cta">
+        <Link className="btn" to="/catalogo">Explorar catálogo</Link>
+        <a className="btn btn-ghost tiktok-link" href={STORE.tiktok} target="_blank" rel="noreferrer">
+          <TikTokIcon size={18} /> Síguenos en TikTok {STORE.tiktokHandle}
+        </a>
+      </div>
     </section>
   )
 }
