@@ -50,11 +50,11 @@ em { color: var(--gold); font-style: italic; }
 .logo { display: inline-flex; align-items: center; gap: 10px; }
 .logo-img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1px solid #333; background: #000; }
 .logo span { color: var(--text); }
-.nav { display: flex; gap: 24px; margin-left: 12px; font-size: 0.85rem; }
-.nav a { color: var(--muted); transition: color 0.2s; }
-.nav a:hover, .nav a.active { color: var(--text); }
+.nav { display: flex; gap: 24px; margin-left: 12px; font-size: 1rem; }
+.nav a { color: #dedede; transition: color 0.2s; }
+.nav a:hover, .nav a.active { color: var(--gold-2); }
 .search { margin-left: auto; }
-.search input { background: var(--bg-2); border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; width: 190px; font-size: 0.85rem; }
+.search input { background: var(--bg-2); border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; width: 190px; font-size: 0.95rem; }
 .search input:focus { outline: none; border-color: var(--gold); }
 .marquee-track span::after { content: '◆'; color: var(--gold); margin-left: 40px; font-size: 0.55rem; vertical-align: 1px; }
 .announce { background: var(--gold); color: #000; text-align: center; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 16px; }
@@ -296,14 +296,14 @@ select:focus, input:focus, textarea:focus { outline: none; border-color: var(--g
 @keyframes wa-ping { from { transform: scale(1); opacity: 0.7; } to { transform: scale(1.7); opacity: 0; } }
 
 /* Cómo comprar */
-.how { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: none; }
+.how { padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: none; }
 .how li { position: relative; padding: 28px 22px 24px; border: 1px solid var(--line); background: var(--card); overflow: hidden; transition: border-color 0.3s, transform 0.3s; }
 .how li:hover { border-color: var(--gold); transform: translateY(-4px); }
 .how-n { position: absolute; right: 12px; top: -6px; font: 5rem/1 var(--serif); color: transparent; -webkit-text-stroke: 1px var(--gold); transition: -webkit-text-stroke-color 0.3s; }
 .how li:hover .how-n { -webkit-text-stroke-color: var(--gold-2); }
-.how h3 { position: relative; font-size: 1.6rem; margin: 40px 0 8px; }
-.how p { position: relative; color: var(--muted); font-size: 0.92rem; }
-.how-note { margin-top: 18px; color: var(--muted); font-size: 0.9rem; text-align: center; }
+.how h3 { position: relative; font-size: 1.85rem; margin: 40px 0 10px; color: #fff; }
+.how p { position: relative; color: #dcdcdc; font-size: 1.05rem; line-height: 1.6; }
+.how-note { margin-top: 20px; color: #d0d0d0; font-size: 1rem; text-align: center; }
 /* Recomendador */
 .rec-wrap { border-block: 1px solid var(--line); background: #0a0a0a; }
 .rec { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 56px; padding-block: 72px; align-items: start; }
@@ -361,3 +361,67 @@ img.hs-img { width: auto; max-height: 158px; }
 @keyframes side-in-l { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
 @keyframes side-in-r { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .hero-center.in-r, .hero-center.in-l, .hero-center.out-l, .hero-center.out-r, .hero-side .hs-img { animation: none; } .hero-center.out-l, .hero-center.out-r { display: none; } }
+/* Mayoristas */
+.ws-intro { margin-bottom: 28px; }
+.ws-intro strong { color: var(--gold); font-weight: 500; }
+.ws { grid-template-columns: 1.5fr 1fr; }
+.ws-cats { margin-bottom: 18px; }
+.ws-list { display: grid; gap: 10px; }
+.ws-list li { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center; padding: 10px 14px; border: 1px solid var(--line); background: var(--card); transition: border-color 0.25s; }
+.ws-list li.has { border-color: var(--gold); }
+.ws-media { display: grid; place-items: center; height: 72px; background: radial-gradient(circle at 50% 60%, #221b10, #0e0e0e 72%); overflow: hidden; }
+.ws-img { height: 64px; width: auto; max-width: 100%; }
+img.ws-img { mix-blend-mode: screen; }
+.ws-info { display: grid; gap: 2px; min-width: 0; }
+.ws-info strong { font-family: var(--serif); font-weight: 500; font-size: 1.15rem; line-height: 1.15; }
+.ws-info small { color: var(--muted); font-size: 0.75rem; letter-spacing: 0.06em; }
+.ws-price { font-size: 0.9rem; }
+.ws-price b { color: var(--gold); font-weight: 500; }
+.ws-price s { color: var(--muted); font-size: 0.8rem; margin-left: 6px; }
+.ws-step { display: inline-flex; align-items: center; border: 1px solid var(--line); }
+.ws-step button { width: 34px; height: 34px; font-size: 1.1rem; color: var(--gold); }
+.ws-step button:disabled { opacity: 0.35; cursor: default; }
+.ws-step button:hover:not(:disabled) { background: var(--card); }
+.ws-step output { min-width: 30px; text-align: center; font-size: 0.95rem; }
+.ws-meter { height: 3px; background: #2a2a2a; }
+.ws-meter i { display: block; height: 100%; background: #777; transition: width 0.3s, background 0.3s; }
+.ws-meter.ok i { background: var(--gold); }
+.ws-save { color: var(--gold); }
+.ws-form { margin-top: 6px; }
+.ws-form .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+@media (max-width: 820px) { .ws { grid-template-columns: 1fr; } }
+.ws .summary { max-height: calc(100vh - 110px); overflow-y: auto; }
+@media (max-width: 820px) { .ws .summary { max-height: none; overflow: visible; } }
+/* Banda de marca en el inicio: texto grande a la izquierda y la foto a la derecha, fundida con el negro */
+.brand-band { position: relative; overflow: hidden; background: #000; border-bottom: 1px solid var(--line); }
+.brand-band-in { position: relative; z-index: 1; display: grid; align-content: center; gap: 28px; min-height: 560px; padding-block: 72px; }
+.brand-band h2 { font-family: 'Playfair Display', Georgia, serif; font-weight: 800; letter-spacing: 0; line-height: 1.1; font-size: clamp(2.2rem, 5vw, 4.4rem); max-width: 14ch; }
+.brand-band h2 span { display: block; }
+.brand-band h2 .l1 { color: #fff; }
+.brand-band h2 .l2 { color: #bdbdbd; }
+.brand-band h2 .l3 { color: #5c5c5c; }
+.brand-band p { color: #c9c9c9; max-width: 44ch; }
+.brand-band-img { position: absolute; z-index: 0; top: 0; right: 0; height: 100%; width: auto; max-width: 70%; object-fit: cover; -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 42%), linear-gradient(to bottom, #000 72%, transparent 100%); -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent 0%, #000 42%), linear-gradient(to bottom, #000 72%, transparent 100%); mask-composite: intersect; }
+@media (max-width: 820px) { .brand-band-in { min-height: 480px; padding-block: 56px; } .brand-band-img { max-width: 100%; opacity: 0.42; } }
+/* Letras más grandes y claras en "Comprar es muy fácil" y en la asesoría */
+.rec-intro .lead { font-size: 1.25rem; color: #ececec; }
+.rec-step { font-size: 0.8rem; color: var(--gold-2); }
+.rec-form .rec-q legend { font-size: 2.1rem; color: #fff; }
+.rec-form .rec-q legend small { font-size: 0.95rem; color: #cfcfcf; }
+.rec-form .chip { font-size: 1.05rem; padding: 10px 22px; color: #ececec; border-color: #555; }
+.rec-form .chip:hover { color: #fff; border-color: var(--gold); }
+.rec-form .chip.on { color: #000; }
+.rec-nav .btn { font-size: 0.95rem; }
+.search input::placeholder { color: #c4c4c4; }
+/* Menú: con letras más grandes, en pantallas medianas se compacta para que todo quepa */
+@media (min-width: 821px) and (max-width: 1120px) {
+  .header-in { gap: 14px; }
+  .nav { gap: 14px; margin-left: 4px; font-size: 0.95rem; }
+  .logo { letter-spacing: 0.2em; }
+  .search input { width: 110px; }
+}
+/* TikTok: burbuja flotante sobre la de WhatsApp y botón en Nosotros */
+.tt { position: fixed; right: 18px; bottom: 84px; z-index: 35; width: 54px; height: 54px; display: grid; place-items: center; border-radius: 50%; background: #000; color: #fff; border: 1px solid #fff; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); transition: transform 0.25s, border-color 0.25s; }
+.tt:hover { transform: scale(1.08); border-color: var(--gold); }
+.about-cta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.tiktok-link { gap: 8px; text-transform: none; letter-spacing: 0.04em; font-size: 0.9rem; }

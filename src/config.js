@@ -8,7 +8,9 @@ export const STORE = {
   tiktokHandle: '@louryx68',
   phoneDisplay: '324 736 2985',
   city: 'Colombia',
-  wholesaleFrom: 4,
+  // Mayoristas: unidades mínimas (en total, mezclando perfumes) y descuento sobre el precio normal.
+  wholesaleFrom: 3,
+  wholesaleDiscount: 0.15,
   // Marcas de la cinta de la portada: deja solo las que vendes.
   brands: ['ARMAF', 'LATTAFA', 'AFNAN', 'RASASI', 'MAISON ALHAMBRA', 'PARIS CORNER'],
   logo: '/brand/logo.jpg',
@@ -17,3 +19,6 @@ export const STORE = {
 
 export const money = (n) =>
   new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n)
+
+// Precio mayorista de un perfume (redondeado a miles).
+export const wholesalePrice = (price) => Math.round((price * (1 - STORE.wholesaleDiscount)) / 1000) * 1000

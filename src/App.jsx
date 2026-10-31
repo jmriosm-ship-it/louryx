@@ -9,6 +9,7 @@ import Home from './pages/Home'
 import Catalog from './pages/Catalog'
 import Product from './pages/Product'
 import Checkout from './pages/Checkout'
+import Wholesale from './pages/Wholesale'
 import { About, Contact, NotFound } from './pages/Info'
 
 function ScrollTop() {
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/catalogo" element={<Catalog />} />
           <Route path="/perfume/:id" element={<Product />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/mayoristas" element={<Wholesale />} />
           <Route path="/nosotros" element={<About />} />
           <Route path="/contacto" element={<Contact />} />
           <Route path="*" element={<NotFound />} />

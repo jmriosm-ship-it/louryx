@@ -24,7 +24,7 @@ export default function HowToBuy() {
           </li>
         ))}
       </ol>
-      <p className="how-note">Manejamos precios mayoristas desde {STORE.wholesaleFrom} unidades. Escríbenos y te cotizamos.</p>
+      <p className="how-note">Compra al por mayor desde {STORE.wholesaleFrom} unidades con precio especial. <Link to="/mayoristas" className="link">Ver mayoristas →</Link></p>
     </section>
   )
 }

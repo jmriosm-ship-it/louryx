@@ -30,6 +30,7 @@ export default function Header() {
           <NavLink to="/catalogo">Catálogo</NavLink>
           <NavLink to="/catalogo?cat=Mujer">Mujer</NavLink>
           <NavLink to="/catalogo?cat=Hombre">Hombre</NavLink>
+          <NavLink to="/mayoristas">Mayoristas</NavLink>
           <NavLink to="/nosotros">Nosotros</NavLink>
           <NavLink to="/contacto">Contacto</NavLink>
         </nav>

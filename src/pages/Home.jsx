@@ -105,8 +105,21 @@ export default function Home() {
         <div className="container strip-in">
           <span>✦ Envíos contra entrega a todo Colombia</span>
           <span>✦ Decants de 5 y 10 ml</span>
-          <span>✦ Precios mayoristas desde {STORE.wholesaleFrom} unidades</span>
+          <Link to="/mayoristas">✦ Precios mayoristas desde {STORE.wholesaleFrom} unidades</Link>
           <span>✦ Atención por WhatsApp</span>
+        </div>
+      </section>
+
+      <section className="brand-band">
+        <img className="brand-band-img" src="/brand/fondo-louryx.jpg" alt="Frasco de perfume Louryx entre humo" />
+        <div className="container brand-band-in">
+          <h2>
+            <span className="l1">Porque un perfume</span>
+            <span className="l2">es tu firma</span>
+            <span className="l3">invisible.</span>
+          </h2>
+          <p>Fragancias elegidas por su desempeño real, con envío contra entrega a todo Colombia.</p>
+          <div><Link to="/catalogo" className="btn">Ver catálogo</Link></div>
         </div>
       </section>
 
