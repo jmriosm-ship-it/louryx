@@ -23,7 +23,6 @@ export default function Footer() {
           <h4>Ayuda</h4>
           <Link to="/#como-comprar">Cómo comprar</Link>
           <Link to="/#recomendacion">Pedir recomendación</Link>
-          <Link to="/#preguntas">Preguntas frecuentes</Link>
           <Link to="/nosotros">Nosotros</Link>
           <Link to="/contacto">Contacto</Link>
           <a href={`https://wa.me/${STORE.whatsapp}`} target="_blank" rel="noreferrer">WhatsApp</a>

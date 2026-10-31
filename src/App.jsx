@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
+import { STORE, money } from './config'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import CartDrawer from './components/CartDrawer'
@@ -27,6 +28,7 @@ export default function App() {
   return (
     <>
       <ScrollTop />
+      <div className="announce">Envío gratis desde {money(STORE.freeShippingFrom)} · Pago contra entrega</div>
       <Header />
       <main>
         <Routes>

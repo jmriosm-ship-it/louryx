@@ -1,6 +1,8 @@
 // Catálogo. Para agregar un perfume, duplica un bloque y cambia los datos.
 // `image` es opcional: si pones una ruta (ej. '/perfumes/noir.jpg') se usa la foto,
 // si no, se dibuja el frasco con el color `tone`.
+// `vendido: true` hace que aparezca en "Más vendidos" del inicio (se muestran 5; el primero va grande).
+// `nuevo: true` hace que el perfume aparezca en el carrusel de la portada (el último agregado sale primero).
 export const CATEGORIES = ['Mujer', 'Hombre', 'Unisex']
 export const FAMILIES = ['Floral', 'Amaderado', 'Oriental', 'Cítrico', 'Gourmand', 'Fresco']
 
@@ -8,7 +10,7 @@ export const products = [
   { id: 'noir-absolu', name: 'Noir Absolu', category: 'Hombre', family: 'Amaderado', size: 100, price: 289000, tone: '#2b2118', accent: '#c9a96a', badge: 'Más vendido', stock: 12,
     notes: { salida: ['Bergamota', 'Pimienta negra'], corazon: ['Cuero', 'Cedro'], fondo: ['Vetiver', 'Ámbar'] },
     description: 'Intenso y nocturno. Un amaderado profundo con cuero y especias, pensado para dejar huella.' },
-  { id: 'rosa-velvet', name: 'Rosa Velvet', category: 'Mujer', family: 'Floral', size: 75, price: 259000, tone: '#6b2737', accent: '#e8b4bc', badge: 'Nuevo', stock: 8,
+  { id: 'rosa-velvet', name: 'Rosa Velvet', category: 'Mujer', family: 'Floral', size: 75, price: 259000, tone: '#6b2737', accent: '#e8b4bc', badge: 'Nuevo', nuevo: true, stock: 8,
     notes: { salida: ['Frambuesa', 'Lichi'], corazon: ['Rosa de Damasco', 'Peonía'], fondo: ['Almizcle', 'Pachulí'] },
     description: 'Rosa aterciopelada con un toque frutal. Romántica, sofisticada y muy femenina.' },
   { id: 'ambre-oud', name: 'Ambre Oud', category: 'Unisex', family: 'Oriental', size: 50, price: 349000, tone: '#4a2c12', accent: '#d9a441', badge: 'Edición limitada', stock: 5,
@@ -32,15 +34,33 @@ export const products = [
   { id: 'eclat-dore', name: 'Éclat Doré', category: 'Mujer', family: 'Oriental', size: 75, price: 275000, tone: '#8c6a1e', accent: '#f5d98a', badge: 'Favorito', stock: 9,
     notes: { salida: ['Naranja sanguina', 'Bergamota'], corazon: ['Iris', 'Ylang-ylang'], fondo: ['Ámbar', 'Sándalo'] },
     description: 'Un destello dorado: cítrico brillante que se funde en un fondo ambarado y sedoso.' },
-  { id: 'bois-mystique', name: 'Bois Mystique', category: 'Unisex', family: 'Amaderado', size: 100, price: 299000, tone: '#24332a', accent: '#9bb89a', stock: 11,
+  { id: 'bois-mystique', name: 'Bois Mystique', category: 'Unisex', family: 'Amaderado', size: 100, price: 299000, tone: '#24332a', accent: '#9bb89a', nuevo: true, stock: 11,
     notes: { salida: ['Incienso', 'Pimienta rosa'], corazon: ['Cedro', 'Iris'], fondo: ['Vetiver', 'Musgo de roble'] },
     description: 'Bosque húmedo e incienso. Sereno, profundo y muy elegante.' },
-  { id: 'fleur-nuit', name: 'Fleur de Nuit', category: 'Mujer', family: 'Floral', size: 100, price: 269000, tone: '#2c1f4a', accent: '#b9a0e8', stock: 6,
+  { id: 'fleur-nuit', name: 'Fleur de Nuit', category: 'Mujer', family: 'Floral', size: 100, price: 269000, tone: '#2c1f4a', accent: '#b9a0e8', nuevo: true, stock: 6,
     notes: { salida: ['Grosella negra', 'Mandarina'], corazon: ['Tuberosa', 'Jazmín'], fondo: ['Vainilla', 'Pachulí'] },
     description: 'Flor nocturna, seductora y misteriosa. Para salir de noche.' },
   { id: 'sport-ice', name: 'Sport Ice', category: 'Hombre', family: 'Cítrico', size: 100, price: 169000, tone: '#1d5560', accent: '#aef0f2', stock: 25,
     notes: { salida: ['Pomelo', 'Menta'], corazon: ['Geranio', 'Enebro'], fondo: ['Madera de cedro', 'Almizcle'] },
     description: 'Frescura helada para entrenar o para el calor. Ligero y revitalizante.' },
+  { id: 'victorias-secret-tease', vendido: true, name: "Victoria's Secret Tease", category: 'Mujer', family: 'Gourmand', size: 100, price: 259000, tone: '#6b3a3a', accent: '#e8b4bc', image: '/perfumes/tease.jpg', badge: 'Nuevo', nuevo: true, stock: 10,
+    notes: { salida: ['Pera', 'Naranja'], corazon: ['Flores blancas', 'Durazno'], fondo: ['Vainilla', 'Almizcle'] },
+    description: 'Dulce, cremoso y seductor. Un gourmand floral con fondo de vainilla, pensado para dejar huella.' },
+  { id: 'jpg-le-beau', vendido: true, name: 'Le Beau', category: 'Hombre', family: 'Fresco', size: 100, price: 349000, tone: '#0f6b73', accent: '#d9b873', image: '/perfumes/le-beau.jpg', badge: 'Nuevo', nuevo: true, stock: 8,
+    notes: { salida: ['Bergamota', 'Cardamomo'], corazon: ['Coco', 'Jengibre'], fondo: ['Haba tonka', 'Madera de cedro'] },
+    description: 'Fresco, tropical y sensual. Coco cremoso sobre un fondo cálido de haba tonka, en un frasco inolvidable.' },
+  { id: 'dior-sauvage', name: 'Dior Sauvage', category: 'Hombre', family: 'Amaderado', size: 100, price: 389000, tone: '#14233f', accent: '#c9a96a', image: '/perfumes/sauvage.png', badge: 'Nuevo', nuevo: true, stock: 8,
+    notes: { salida: ['Bergamota', 'Pimienta'], corazon: ['Lavanda', 'Pachulí'], fondo: ['Ambroxan', 'Vainilla'] },
+    description: 'Fresco, especiado y magnético. Bergamota y pimienta sobre un fondo cálido de ambroxan y vainilla, con estela larga.' },
+  { id: 'lv-les-sables-roses', name: 'Les Sables Roses', category: 'Unisex', family: 'Oriental', size: 100, price: 890000, tone: '#3a1a22', accent: '#d9a441', image: '/perfumes/sables-roses.png', badge: 'Nuevo', nuevo: true, vendido: true, stock: 4,
+    notes: { salida: ['Azafrán', 'Bergamota'], corazon: ['Rosa', 'Oud'], fondo: ['Ámbar', 'Almizcle'] },
+    description: 'Rosa profunda sobre oud y azafrán. Una fragancia de lujo, cálida y misteriosa, de las que se recuerdan.' },
+  { id: 'ysl-libre-intense', name: 'Libre Intense', category: 'Mujer', family: 'Oriental', size: 90, price: 520000, tone: '#8a4a10', accent: '#f0b255', image: '/perfumes/libre-intense.png', badge: 'Nuevo', nuevo: true, vendido: true, stock: 6,
+    notes: { salida: ['Mandarina', 'Lavanda'], corazon: ['Flor de azahar', 'Jazmín'], fondo: ['Vainilla', 'Ámbar'] },
+    description: 'Lavanda y azahar con un fondo de vainilla ámbar. Libre, intensa y con mucha presencia.' },
+  { id: 'armaf-club-de-nuit-untold', name: 'Club de Nuit Untold', category: 'Unisex', family: 'Oriental', size: 105, price: 210000, tone: '#7a0f1f', accent: '#e8c35a', image: '/perfumes/club-de-nuit-untold.png', badge: 'Nuevo', nuevo: true, vendido: true, stock: 12,
+    notes: { salida: ['Limón', 'Azafrán'], corazon: ['Jazmín', 'Pimienta'], fondo: ['Ámbar', 'Almizcle'] },
+    description: 'Especiado, ambarado y con estela larga. Un clásico árabe de Armaf para destacar de noche.' },
 ]
 
 export const getProduct = (id) => products.find((p) => p.id === id)

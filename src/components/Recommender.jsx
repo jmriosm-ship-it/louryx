@@ -10,8 +10,11 @@ const QUESTIONS = [
 
 export default function Recommender() {
   const [sel, setSel] = useState({ para: [], aromas: [], momento: [], tamano: [] })
+  const [step, setStep] = useState(0)
+  const q = QUESTIONS[step]
+  const last = step === QUESTIONS.length - 1
 
-  const toggle = (q, opt) =>
+  const toggle = (opt) =>
     setSel((cur) => {
       const has = cur[q.key].includes(opt)
       if (!q.multi) return { ...cur, [q.key]: has ? [] : [opt] }
@@ -32,31 +35,39 @@ export default function Recommender() {
       <div className="container rec">
         <div className="rec-intro">
           <p className="eyebrow">Asesoría personalizada</p>
-          <h2>¿No sabes cuál elegir?</h2>
-          <p className="lead">Cuéntanos qué te gusta. Marca las opciones y te armamos el mensaje listo para enviarnos por WhatsApp; nosotros te recomendamos el ideal.</p>
+          <h2>Te ayudamos a elegir</h2>
+          <p className="lead">Responde 4 preguntas rápidas y te enviamos una recomendación personal por WhatsApp.</p>
         </div>
         <div className="rec-form">
-          {QUESTIONS.map((q) => (
-            <fieldset key={q.key}>
-              <legend>{q.label}{q.multi && <small> · puedes marcar varias</small>}</legend>
-              <div className="chips">
-                {q.options.map((o) => (
-                  <button
-                    key={o}
-                    type="button"
-                    className={`chip ${sel[q.key].includes(o) ? 'on' : ''}`}
-                    aria-pressed={sel[q.key].includes(o)}
-                    onClick={() => toggle(q, o)}
-                  >
-                    {o}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-          ))}
-          <a className="btn" href={href} target="_blank" rel="noreferrer">Pedir recomendación por WhatsApp</a>
+          <div className="rec-prog" aria-hidden="true">
+            {QUESTIONS.map((x, i) => <i key={x.key} className={i <= step ? 'on' : ''} />)}
+          </div>
+          <p className="rec-step">Paso {step + 1} de {QUESTIONS.length}</p>
+          <fieldset key={q.key} className="rec-q">
+            <legend>{q.label}{q.multi && <small> · puedes marcar varias</small>}</legend>
+            <div className="chips">
+              {q.options.map((o) => (
+                <button
+                  key={o}
+                  type="button"
+                  className={`chip ${sel[q.key].includes(o) ? 'on' : ''}`}
+                  aria-pressed={sel[q.key].includes(o)}
+                  onClick={() => toggle(o)}
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <div className="rec-nav">
+            {step > 0 && <button type="button" className="btn btn-ghost" onClick={() => setStep(step - 1)}>← Atrás</button>}
+            {last
+              ? <a className="btn" href={href} target="_blank" rel="noreferrer">Pedir recomendación por WhatsApp</a>
+              : <button type="button" className="btn" onClick={() => setStep(step + 1)}>Siguiente →</button>}
+          </div>
         </div>
       </div>
     </section>
   )
 }
+
