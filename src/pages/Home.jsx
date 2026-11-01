@@ -6,7 +6,7 @@ import HowToBuy from '../components/HowToBuy'
 import Recommender from '../components/Recommender'
 import Benefits from '../components/Benefits'
 import { products, CATEGORIES } from '../data/products'
-import { STORE, money } from '../config'
+import { STORE, money, asset } from '../config'
 
 // Perfumes nuevos: los marcados con `nuevo: true` en products.js (el más reciente primero).
 // Si no hay ninguno marcado, se usan los últimos agregados al catálogo.
@@ -111,7 +111,7 @@ export default function Home() {
       </section>
 
       <section className="brand-band">
-        <img className="brand-band-img" src="/brand/fondo-louryx.jpg" alt="Frasco de perfume Louryx entre humo" />
+        <img className="brand-band-img" src={asset('/brand/fondo-louryx.jpg')} alt="Frasco de perfume Louryx entre humo" />
         <div className="container brand-band-in">
           <h2>
             <span className="l1">Porque un perfume</span>

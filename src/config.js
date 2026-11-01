@@ -1,4 +1,7 @@
 // Datos de la tienda: cambia aquí el WhatsApp, redes y contacto.
+// Rutas de /public que respetan la base del sitio (GitHub Pages sirve en /louryx/).
+export const asset = (p) => (p && p.startsWith('/') ? import.meta.env.BASE_URL + p.slice(1) : p)
+
 export const STORE = {
   name: 'Louryx',
   tagline: 'Perfumería de autor',
@@ -13,7 +16,7 @@ export const STORE = {
   wholesaleDiscount: 0.15,
   // Marcas de la cinta de la portada: deja solo las que vendes.
   brands: ['ARMAF', 'LATTAFA', 'AFNAN', 'RASASI', 'MAISON ALHAMBRA', 'PARIS CORNER'],
-  logo: '/brand/logo.jpg',
+  logo: asset('/brand/logo.jpg'),
   freeShippingFrom: 250000,
 }
 

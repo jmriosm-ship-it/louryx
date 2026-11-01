@@ -1,10 +1,11 @@
 {
-  "homepage": "https://github.com/jmriosm-ship-it/louryx.git",
+  "homepage": "https://jmriosm-ship-it.github.io/louryx",
   "name": "louryx",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "postbuild": "node -e \"require('fs').copyFileSync('dist/index.html','dist/404.html')\"",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "dev": "vite",

@@ -1,6 +1,8 @@
+import { asset } from '../config'
+
 // Frasco dibujado en SVG con el color del perfume. Si hay foto, se usa la foto.
 export default function Bottle({ product, className = '' }) {
-  if (product.image) return <img className={className} src={product.image} alt={product.name} loading="lazy" />
+  if (product.image) return <img className={className} src={asset(product.image)} alt={product.name} loading="lazy" />
   const { tone, accent, name } = product
   const id = `g-${product.id}`
   return (
