@@ -7,15 +7,6 @@ export const CATEGORIES = ['Mujer', 'Hombre', 'Unisex']
 export const FAMILIES = ['Floral', 'Amaderado', 'Oriental', 'Cítrico', 'Gourmand', 'Fresco']
 
 export const products = [
-  { id: 'victorias-secret-tease', vendido: true, name: "Victoria's Secret Tease", category: 'Mujer', family: 'Gourmand', size: 100, price: 259000, tone: '#6b3a3a', accent: '#e8b4bc', image: '/perfumes/tease.jpg', badge: 'Nuevo', stock: 10,
-    notes: { salida: ['Pera', 'Naranja'], corazon: ['Flores blancas', 'Durazno'], fondo: ['Vainilla', 'Almizcle'] },
-    description: 'Dulce, cremoso y seductor. Un gourmand floral con fondo de vainilla, pensado para dejar huella.' },
-  { id: 'jpg-le-beau', vendido: true, name: 'Le Beau', category: 'Hombre', family: 'Fresco', size: 100, price: 349000, tone: '#0f6b73', accent: '#d9b873', image: '/perfumes/le-beau.jpg', badge: 'Nuevo', stock: 8,
-    notes: { salida: ['Bergamota', 'Cardamomo'], corazon: ['Coco', 'Jengibre'], fondo: ['Haba tonka', 'Madera de cedro'] },
-    description: 'Fresco, tropical y sensual. Coco cremoso sobre un fondo cálido de haba tonka, en un frasco inolvidable.' },
-  { id: 'dior-sauvage', name: 'Dior Sauvage', category: 'Hombre', family: 'Amaderado', size: 100, price: 389000, tone: '#14233f', accent: '#c9a96a', image: '/perfumes/sauvage.png', badge: 'Nuevo', stock: 8,
-    notes: { salida: ['Bergamota', 'Pimienta'], corazon: ['Lavanda', 'Pachulí'], fondo: ['Ambroxan', 'Vainilla'] },
-    description: 'Fresco, especiado y magnético. Bergamota y pimienta sobre un fondo cálido de ambroxan y vainilla, con estela larga.' },
   { id: 'rasasi-hawas-fire', name: 'Hawas Fire', category: 'Hombre', family: 'Fresco', size: 100, price: 190000, tone: '#8a0f1f', accent: '#e8453c', image: '/perfumes/hawas-fire.png', badge: 'Nuevo', nuevo: true, stock: 10,
     notes: { salida: ['Pomelo', 'Bergamota'], corazon: ['Canela', 'Jengibre'], fondo: ['Ámbar', 'Almizcle'] },
     description: 'Fresco, especiado y con mucha energía. Un clásico de Rasasi con salida cítrica y fondo ambarado de larga duración.' },

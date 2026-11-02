@@ -2,20 +2,14 @@ import { Link } from 'react-router-dom'
 import { useCatalog } from '../context/CatalogContext'
 import { asset } from '../config'
 
-// Foto de portada por categoría (opcional): pon la ruta de la imagen en /public.
-// Las categorías creadas en el panel de administración usan la foto que se les puso allí.
-const COVERS = {
-  Mujer: '/perfumes/portada-mujer.webp',
-  Hombre: '/perfumes/portada-hombre.webp',
-  Unisex: '/perfumes/portada-unisex.webp',
-}
-
+// Las colecciones no llevan foto por defecto. Si se le pone una foto a una categoría
+// en el panel de administración, se usa esa.
 export default function Collections() {
   const { products, categories, categoryPhotos } = useCatalog()
   return (
     <div className="col-row">
       {categories.map((c, i) => {
-        const cover = categoryPhotos[c] || COVERS[c]
+        const cover = categoryPhotos[c]
         return (
           <Link key={c} to={`/catalogo?cat=${encodeURIComponent(c)}`} className={`col-panel ${cover ? 'has-img' : ''}`} style={cover ? { '--img': `url(${asset(cover)})` } : undefined}>
             <span className="col-n">{String(i + 1).padStart(2, '0')}</span>
