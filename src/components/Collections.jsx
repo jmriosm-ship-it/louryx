@@ -1,19 +1,11 @@
 import { Link } from 'react-router-dom'
 import { products, CATEGORIES } from '../data/products'
-import { asset } from '../config'
-
-// Foto de portada por categoría (opcional): pon la ruta de la imagen en /public.
-const COVERS = {
-  Mujer: '/perfumes/portada-mujer.webp',
-  Hombre: '/perfumes/portada-hombre.webp',
-  Unisex: '/perfumes/portada-unisex.webp',
-}
 
 export default function Collections() {
   return (
     <div className="col-row">
       {CATEGORIES.map((c, i) => (
-        <Link key={c} to={`/catalogo?cat=${c}`} className={`col-panel ${COVERS[c] ? 'has-img' : ''}`} style={COVERS[c] ? { '--img': `url(${asset(COVERS[c])})` } : undefined}>
+        <Link key={c} to={`/catalogo?cat=${c}`} className="col-panel">
           <span className="col-n">0{i + 1}</span>
           <span className="col-plus" aria-hidden="true">+</span>
           <i className="col-line" aria-hidden="true" />
