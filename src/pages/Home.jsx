@@ -60,16 +60,10 @@ export default function Home() {
   const sold = products.filter((p) => p.vendido)
   const featured = (sold.length >= 5 ? sold : sold.concat(products.filter((p) => !p.vendido))).slice(0, 5)
   const [star, ...rest] = featured
-  const brands = [...STORE.brands, ...STORE.brands]
 
   return (
     <>
       <section className="hero" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-        <div className="marquee" aria-hidden="true">
-          <div className="marquee-track">
-            {brands.map((b, i) => <span key={i}>{b}</span>)}
-          </div>
-        </div>
         <div className="container hero-stage">
           <svg className="hero-tri" viewBox="0 0 300 260" aria-hidden="true">
             <g className="t1"><polygon points="150,10 290,250 10,250" strokeWidth="1.2" /></g>

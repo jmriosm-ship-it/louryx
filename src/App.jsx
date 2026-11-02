@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
-import { STORE, money } from './config'
+import { STORE } from './config'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import CartDrawer from './components/CartDrawer'
@@ -29,7 +29,11 @@ export default function App() {
   return (
     <>
       <ScrollTop />
-      <div className="announce">Envío gratis desde {money(STORE.freeShippingFrom)} · Pago contra entrega</div>
+      <div className="announce" aria-hidden="true">
+        <div className="marquee-track">
+          {[...STORE.brands, ...STORE.brands].map((b, i) => <span key={i}>{b}</span>)}
+        </div>
+      </div>
       <Header />
       <main>
         <Routes>
