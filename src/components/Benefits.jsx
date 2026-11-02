@@ -2,6 +2,10 @@ import { STORE, money } from '../config'
 
 const stroke = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.4, strokeLinecap: 'round', strokeLinejoin: 'round' }
 
+const PLACE = encodeURIComponent('Convención, Norte de Santander, Colombia')
+const MAPS_LINK = `https://www.google.com/maps/search/?api=1&query=${PLACE}`
+const MAPS_EMBED = `https://www.google.com/maps?q=${PLACE}&output=embed`
+
 const ITEMS = [
   {
     title: 'Envío gratis',
@@ -52,6 +56,15 @@ export default function Benefits() {
             ? <a key={it.title} className="bn" href={it.href} target="_blank" rel="noreferrer">{body}</a>
             : <div key={it.title} className="bn">{body}</div>
         })}
+      </div>
+      <div className="container find">
+        <div className="find-info">
+          <span className="eyebrow">Visítanos</span>
+          <h2>Encuéntranos</h2>
+          <p>Convención, Norte de Santander, Colombia.</p>
+          <a className="btn" href={MAPS_LINK} target="_blank" rel="noreferrer">Abrir en Maps</a>
+        </div>
+        <iframe className="find-map" title="Ubicación de Louryx en Convención, Norte de Santander" src={MAPS_EMBED} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
       </div>
     </section>
   )
