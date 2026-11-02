@@ -11,6 +11,7 @@ import Product from './pages/Product'
 import Checkout from './pages/Checkout'
 import Wholesale from './pages/Wholesale'
 import Admin from './pages/Admin'
+import { Privacy, Terms, Shipping } from './pages/Legal'
 import { About, Contact, NotFound } from './pages/Info'
 
 function ScrollTop() {
@@ -83,6 +84,9 @@ export default function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/mayoristas" element={<Wholesale />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/privacidad" element={<Privacy />} />
+          <Route path="/terminos" element={<Terms />} />
+          <Route path="/envios" element={<Shipping />} />
           <Route path="/nosotros" element={<About />} />
           <Route path="/contacto" element={<Contact />} />
           <Route path="*" element={<NotFound />} />

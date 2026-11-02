@@ -14,6 +14,16 @@ export const STORE = {
   tiktokHandle: '@louryx68',
   phoneDisplay: '324 736 2985',
   city: 'Colombia',
+  // Datos legales: responsable del negocio y de los datos personales. Los usan las páginas
+  // de privacidad, términos y envíos. Si algo cambia, se cambia aquí y se actualiza en todas.
+  legal: {
+    brand: 'LOURYX',
+    owner: 'Julián Darío Picón Durán',
+    nit: '1092732537',
+    email: 'julianpicon07.8@gmail.com',
+    updated: '2 de noviembre de 2026',
+    reportDays: 5, // días hábiles para avisar de un producto con defecto o equivocado
+  },
   // Mayoristas: unidades mínimas (en total, mezclando perfumes; no hay máximo) y descuento sobre el precio normal.
   // Para cambiar el descuento, pon el porcentaje aquí en decimal (0.15 = 15%, 0.2 = 20%): se aplica solo en toda la tienda.
   wholesaleFrom: 3,
@@ -21,7 +31,6 @@ export const STORE = {
   // Marcas de la cinta de la portada: deja solo las que vendes.
   brands: ['ARMAF', 'LATTAFA', 'AFNAN', 'RASASI', 'MAISON ALHAMBRA', 'PARIS CORNER'],
   logo: asset('/brand/logo.jpg'),
-  freeShippingFrom: 250000,
 }
 
 export const money = (n) =>

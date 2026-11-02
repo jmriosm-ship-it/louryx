@@ -1,4 +1,4 @@
-import { STORE, money } from '../config'
+import { STORE } from '../config'
 
 const stroke = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.4, strokeLinecap: 'round', strokeLinejoin: 'round' }
 
@@ -8,8 +8,8 @@ const MAPS_EMBED = `https://www.google.com/maps?q=${PLACE}&output=embed`
 
 const ITEMS = [
   {
-    title: 'Envío gratis',
-    text: `Desde ${money(STORE.freeShippingFrom)} a toda Colombia, con pago contra entrega.`,
+    title: 'Pago contra entrega',
+    text: 'Enviamos a toda Colombia. Pagas cuando recibes tu pedido.',
     icon: (
       <svg viewBox="0 0 24 24" {...stroke}>
         <circle cx="7" cy="17" r="2" /><circle cx="17" cy="17" r="2" />

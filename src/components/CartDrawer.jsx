@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Bottle from './Bottle'
 import { useCart } from '../context/CartContext'
-import { money, STORE } from '../config'
+import { money } from '../config'
 
 export default function CartDrawer() {
   const { lines, subtotal, setQty, remove, open, setOpen } = useCart()
@@ -12,8 +12,6 @@ export default function CartDrawer() {
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [setOpen])
-
-  const missing = Math.max(0, STORE.freeShippingFrom - subtotal)
 
   return (
     <>
@@ -31,9 +29,6 @@ export default function CartDrawer() {
           </div>
         ) : (
           <>
-            <p className="ship-note">
-              {missing === 0 ? '🎉 Tienes envío gratis' : `Te faltan ${money(missing)} para envío gratis`}
-            </p>
             <ul className="drawer-list">
               {lines.map(({ product: p, qty }) => (
                 <li key={p.id}>

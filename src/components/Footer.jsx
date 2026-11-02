@@ -36,7 +36,12 @@ export default function Footer() {
         <p>Las mejores referencias en perfumes. Decants de 5 y 10 ml, envíos contra entrega a todo Colombia.</p>
       </div>
 
-      <p className="copy">© {new Date().getFullYear()} Louryx. Todos los derechos reservados.</p>
+      <nav className="footer-legal" aria-label="Información legal">
+        <Link to="/privacidad">Política de privacidad</Link>
+        <Link to="/terminos">Términos y condiciones</Link>
+        <Link to="/envios">Envíos y devoluciones</Link>
+      </nav>
+      <p className="copy">© {new Date().getFullYear()} {STORE.legal.brand} · NIT {STORE.legal.nit}. Todos los derechos reservados.</p>
     </footer>
   )
 }

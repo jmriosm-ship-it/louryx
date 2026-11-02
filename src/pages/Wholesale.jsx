@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Bottle from '../components/Bottle'
 import { useCatalog } from '../context/CatalogContext'
 import { money, soldOut, STORE, wholesalePercent, wholesalePrice } from '../config'
@@ -58,8 +59,6 @@ export default function Wholesale() {
   const ready = lines.some((l) => l.ws)
   const subtotal = lines.reduce((s, l) => s + l.n * l.unit, 0)
   const normal = lines.reduce((s, l) => s + l.n * base(l.p), 0)
-  const shipping = subtotal >= STORE.freeShippingFrom || subtotal === 0 ? 0 : 12000
-  const total = subtotal + shipping
   const on = (k) => (e) => setF({ ...f, [k]: e.target.value })
   const cats = ['Todos', ...categories]
   const list = products.filter((p) => cat === 'Todos' || p.category === cat)
@@ -73,9 +72,8 @@ export default function Wholesale() {
       ...lines.map((l) => `• ${l.n} x ${l.p.name} (${l.p.size} ml) — ${money(l.n * l.unit)}${l.ws ? ` (mayorista, ${l.pct}% menos)` : ' (precio normal)'}`),
       '',
       `Unidades: ${units}`,
-      `Subtotal: ${money(subtotal)}`,
-      `Envío: ${shipping ? money(shipping) : 'Gratis'}`,
-      `*Total: ${money(total)}*`,
+      'Envío: se confirma por WhatsApp',
+      `*Total de productos: ${money(subtotal)}*`,
       '',
       `Nombre: ${f.nombre}`,
       `Teléfono: ${f.telefono}`,
@@ -181,9 +179,8 @@ export default function Wholesale() {
             </ul>
           )}
           {normal > subtotal && <div className="row ws-save"><span>Ahorras</span><span>{money(normal - subtotal)}</span></div>}
-          <div className="row"><span>Subtotal</span><span>{money(subtotal)}</span></div>
-          <div className="row"><span>Envío</span><span>{shipping ? money(shipping) : 'Gratis'}</span></div>
-          <div className="row total"><span>Total</span><strong>{money(total)}</strong></div>
+          <div className="row"><span>Envío</span><span>Se confirma por WhatsApp</span></div>
+          <div className="row total"><span>Total de productos</span><strong>{money(subtotal)}</strong></div>
 
           <form onSubmit={submit} className="form ws-form">
             <label>Nombre completo<input required value={f.nombre} onChange={on('nombre')} autoComplete="name" /></label>
@@ -195,6 +192,7 @@ export default function Wholesale() {
               {ready ? 'Enviar pedido por WhatsApp' : `Pide ${min} o más de un mismo perfume`}
             </button>
           </form>
+          <p className="muted legal-note">Al enviar tu pedido aceptas la <Link to="/privacidad">política de privacidad</Link> y los <Link to="/terminos">términos y condiciones</Link>.</p>
           <p className="muted">No se cobra nada en línea: coordinamos el pago contigo por WhatsApp.</p>
         </aside>
       </div>

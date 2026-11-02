@@ -10,8 +10,6 @@ export default function Checkout() {
   const [f, setF] = useState(empty)
   const [sent, setSent] = useState(false)
 
-  const shipping = subtotal >= STORE.freeShippingFrom || subtotal === 0 ? 0 : 12000
-  const total = subtotal + shipping
   const on = (k) => (e) => setF({ ...f, [k]: e.target.value })
 
   const submit = (e) => {
@@ -21,9 +19,8 @@ export default function Checkout() {
       '',
       ...lines.map((l) => `• ${l.qty} x ${l.product.name} (${l.product.size} ml) — ${money(l.qty * l.product.price)}`),
       '',
-      `Subtotal: ${money(subtotal)}`,
-      `Envío: ${shipping ? money(shipping) : 'Gratis'}`,
-      `*Total: ${money(total)}*`,
+      'Envío: se confirma por WhatsApp',
+      `*Total de productos: ${money(subtotal)}*`,
       '',
       `Nombre: ${f.nombre}`,
       `Teléfono: ${f.telefono}`,
@@ -66,6 +63,7 @@ export default function Checkout() {
           <label>Dirección<input required value={f.direccion} onChange={on('direccion')} autoComplete="street-address" /></label>
           <label>Notas (opcional)<textarea rows="3" value={f.notas} onChange={on('notas')} /></label>
           <button className="btn btn-block">Enviar pedido por WhatsApp</button>
+          <p className="muted legal-note">Al enviar tu pedido aceptas la <Link to="/privacidad">política de privacidad</Link> y los <Link to="/terminos">términos y condiciones</Link>.</p>
           <p className="muted">No se cobra nada en línea: coordinamos el pago contigo por WhatsApp.</p>
         </form>
 
@@ -76,9 +74,8 @@ export default function Checkout() {
               <li key={l.id}><span>{l.qty} × {l.product.name}</span><span>{money(l.qty * l.product.price)}</span></li>
             ))}
           </ul>
-          <div className="row"><span>Subtotal</span><span>{money(subtotal)}</span></div>
-          <div className="row"><span>Envío</span><span>{shipping ? money(shipping) : 'Gratis'}</span></div>
-          <div className="row total"><span>Total</span><strong>{money(total)}</strong></div>
+          <div className="row"><span>Envío</span><span>Se confirma por WhatsApp</span></div>
+          <div className="row total"><span>Total de productos</span><strong>{money(subtotal)}</strong></div>
         </aside>
       </div>
     </section>

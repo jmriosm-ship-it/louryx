@@ -82,7 +82,7 @@ export default function Product() {
                 </div>
                 <button className="btn" onClick={() => add(p.id, Math.min(qty, p.stock))}>Agregar al carrito</button>
               </div>
-              <p className="muted">{p.stock <= 6 ? `¡Quedan solo ${p.stock} unidades!` : 'Disponible · Envío en 2–4 días hábiles'}</p>
+              <p className="muted">{p.stock <= 6 ? `¡Quedan solo ${p.stock} unidades!` : 'Disponible · Envío a todo Colombia contra entrega'}</p>
             </>
           )}
         </div>

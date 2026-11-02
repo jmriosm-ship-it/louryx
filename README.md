@@ -19,7 +19,7 @@ Abre la dirección que muestra la terminal (termina en `/louryx/`).
 
 | Qué | Dónde |
 | --- | --- |
-| WhatsApp, TikTok, mayoristas, envío gratis, marcas de la cinta | `src/config.js` |
+| WhatsApp, TikTok, mayoristas, marcas de la cinta | `src/config.js` |
 | Perfumes, precios, notas y fotos | `src/data/products.js` |
 | Fotos y logo | `public/perfumes` y `public/brand` |
 | Colores y estilos | `src/styles.css` |
@@ -67,3 +67,9 @@ Para que los cambios los vea todo el mundo hay que conectar una base de datos gr
 7. Entra a `/admin`, inicia sesión y, si la base está vacía, pulsa **Cargar los perfumes actuales** para poder editar los que ya existen.
 
 Mientras la base esté vacía la tienda muestra los perfumes de `src/data/products.js`.
+
+## Páginas legales
+
+Privacidad (`/privacidad`), términos (`/terminos`) y envíos, cambios y devoluciones (`/envios`) están en `src/pages/Legal.jsx`.
+Los datos del responsable (nombre, NIT, correo y fecha de actualización) se cambian en `legal` dentro de `src/config.js`.
+Son textos base para una tienda en línea en Colombia; conviene que un abogado los revise antes de hacer publicidad pagada.

@@ -5,7 +5,7 @@ const STEPS = [
   { n: '01', t: 'Elige tu perfume', d: 'Explora el catálogo y escoge el frasco o un decant de 5 o 10 ml.' },
   { n: '02', t: 'Haz tu pedido', d: 'Agrégalo al carrito y envíanos el pedido por WhatsApp, o escríbenos directo.' },
   { n: '03', t: 'Te confirmamos', d: 'Revisamos disponibilidad y te decimos el valor del envío y el tiempo de entrega.' },
-  { n: '04', t: 'Pagas al recibir', d: 'Envíos contra entrega a todo Colombia. Pagas cuando te llega.' },
+  { n: '04', t: 'Pagas al recibir', d: 'Envíos contra entrega a todo Colombia. Pagas cuando te llega y grabas un video al abrir el paquete: es tu garantía.' },
 ]
 
 export default function HowToBuy() {
