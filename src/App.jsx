@@ -46,7 +46,7 @@ function ScrollReveal() {
           }
         }
       },
-      { threshold: 0.06, rootMargin: '0px 0px -6% 0px' },
+      { threshold: 0, rootMargin: '0px 0px 12% 0px' },
     )
     els.forEach((el) => {
       el.classList.add('reveal')

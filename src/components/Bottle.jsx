@@ -1,8 +1,14 @@
+import { useEffect, useState } from 'react'
 import { asset } from '../config'
 
-// Frasco dibujado en SVG con el color del perfume. Si hay foto, se usa la foto.
+// Frasco dibujado en SVG con el color del perfume. Si hay foto, se usa la foto;
+// si la foto no carga (ruta mala o archivo borrado), se dibuja el frasco en vez del ícono roto.
 export default function Bottle({ product, className = '' }) {
-  if (product.image) return <img className={className} src={asset(product.image)} alt={product.name} loading="lazy" />
+  const [failed, setFailed] = useState(false)
+  useEffect(() => setFailed(false), [product.image])
+  if (product.image && !failed) {
+    return <img className={className} src={asset(product.image)} alt={product.name} loading="lazy" onError={() => setFailed(true)} />
+  }
   const { tone, accent, name } = product
   const id = `g-${product.id}`
   return (

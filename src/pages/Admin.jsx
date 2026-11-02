@@ -111,6 +111,12 @@ function Panel() {
     }
   }
 
+  // Modo de prueba: borra lo guardado en este navegador y la tienda vuelve a mostrar los perfumes de src/data/products.js
+  const clearTestData = async () => {
+    if (!window.confirm('¿Borrar todo lo que hay en el panel de prueba (perfumes y categorías de este navegador)? La tienda volverá a mostrar los perfumes originales.')) return
+    store.clearLocal()
+    await done('Datos de prueba borrados')
+  }
   // Suma o resta una unidad sin abrir el formulario (para llevar el inventario al día)
   const setStock = (p, n) => attempt(() => store.saveProduct({ id: p.id, stock: Math.max(0, n) }), 'Cantidad actualizada')
   const saveWholesale = (p, patch) => attempt(() => store.saveProduct({ id: p.id, ...patch }), 'Mayorista guardado')
@@ -176,7 +182,8 @@ function Panel() {
         <>
           {store.isLocal && (
             <p className="ad-note">
-              <b>Modo de prueba.</b> Todavía no hay una base de datos conectada: lo que crees aquí solo se guarda en este navegador y no lo verán tus clientes.
+              <b>Modo de prueba.</b> Todavía no hay una base de datos conectada: lo que crees aquí solo se guarda en este navegador y no lo verán tus clientes.{' '}
+              <button type="button" className="ad-link" onClick={clearTestData}>Borrar los datos de prueba</button>
             </p>
           )}
           {msg && <p className="ad-ok" role="status">{msg}</p>}
@@ -278,7 +285,12 @@ function Panel() {
   )
 }
 
-const Thumb = ({ src }) => (src ? <img src={asset(src)} alt="" /> : <span className="ad-thumb-empty">Sin foto</span>)
+// Miniatura: si la foto no carga (por ejemplo una ruta vieja), muestra "Sin foto" en vez del ícono roto
+function Thumb({ src }) {
+  const [failed, setFailed] = useState(false)
+  useEffect(() => setFailed(false), [src])
+  return src && !failed ? <img src={asset(src)} alt="" onError={() => setFailed(true)} /> : <span className="ad-thumb-empty">{src ? 'No carga' : 'Sin foto'}</span>
+}
 
 // Fotos: la primera es la portada. Con `single` solo se puede tener una (se reemplaza al subir otra).
 function PhotoList({ photos, onChange, single = false, addLabel = '+ Foto', main = false }) {

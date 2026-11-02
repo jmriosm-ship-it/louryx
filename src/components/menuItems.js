@@ -1,6 +1,12 @@
 // Opciones de "Colección": cada una lleva a un filtro del catálogo y muestra una foto de vista previa.
-// La foto de una categoría es la que se le puso en el panel de administración; si no tiene,
-// se usa la de su primer perfume con imagen, y si tampoco, la foto de fondo de Louryx.
+// La foto de una categoría es la que se le puso en el panel de administración; si no tiene, se usa
+// la portada fija de abajo (las tres colecciones de siempre), luego la de su primer perfume con imagen,
+// y si tampoco, la foto de fondo de Louryx.
+const COVER = {
+  Mujer: '/perfumes/portada-mujer.webp',
+  Hombre: '/perfumes/portada-hombre.webp',
+  Unisex: '/perfumes/portada-unisex.webp',
+}
 const FALLBACK = '/brand/fondo-louryx.jpg'
 
 export function buildMenuItems({ products, categories, families, categoryPhotos = {} }) {
@@ -15,7 +21,7 @@ export function buildMenuItems({ products, categories, families, categoryPhotos 
     ...categories.map((c) => ({
       title: c,
       to: `/catalogo?cat=${encodeURIComponent(c)}`,
-      ...photoItem(categoryPhotos[c], firstImage((p) => p.category === c)),
+      ...photoItem(categoryPhotos[c] || COVER[c], firstImage((p) => p.category === c)),
       count: products.filter((p) => p.category === c).length,
     })),
     ...families.map((f) => ({

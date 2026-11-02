@@ -14,6 +14,8 @@ const readLocal = () => {
   }
 }
 const writeLocal = (db) => localStorage.setItem(LOCAL_KEY, JSON.stringify(db))
+// Modo de prueba: borra todo lo guardado en este navegador
+export const clearLocal = () => localStorage.removeItem(LOCAL_KEY)
 const newId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`)
 
 // Quita lo que la base genera sola y lo que no es una columna

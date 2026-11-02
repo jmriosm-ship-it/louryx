@@ -609,9 +609,9 @@ img.ws-img { mix-blend-mode: screen; }
 .ws-hint.ok { color: #fff; }
 
 /* Desvanecido al hacer scroll (ver ScrollReveal en App.jsx) */
-.reveal { opacity: 0; transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.reveal.from-below { transform: translateY(36px); }
-.reveal.from-above { transform: translateY(-36px); }
+.reveal { opacity: 0; transition: opacity 0.35s ease-out, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.reveal.from-below { transform: translateY(18px); }
+.reveal.from-above { transform: translateY(-18px); }
 .reveal.is-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
 
