@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom'
 import { STORE } from '../config'
 
 const STEPS = [
-  { n: '01', t: 'Elige tu perfume', d: 'Explora el catálogo y escoge el frasco o un decant de 5 o 10 ml.' },
-  { n: '02', t: 'Haz tu pedido', d: 'Agrégalo al carrito y envíanos el pedido por WhatsApp, o escríbenos directo.' },
-  { n: '03', t: 'Te confirmamos', d: 'Revisamos disponibilidad y te decimos el valor del envío y el tiempo de entrega.' },
-  { n: '04', t: 'Pagas al recibir', d: 'Envíos contra entrega a todo Colombia. Pagas cuando te llega y grabas un video al abrir el paquete: es tu garantía.' },
+  { n: '01', t: 'Elige tu perfume', d: 'Explora nuestro catálogo y encuentra tu próximo perfume favorito.' },
+  { n: '02', t: 'Realiza tu pedido', d: 'Agrega tus productos al carrito y envíanos tu pedido por WhatsApp para continuar con la compra.' },
+  { n: '03', t: 'Confirmamos tu pedido', d: 'Verificamos la disponibilidad, te informamos el costo del envío y el tiempo estimado de entrega.' },
+  { n: '04', t: 'Recibe tu pedido', d: 'Elige tu forma de pago: anticipado o contra entrega. Recibe en casa o reclama tu pedido en la transportadora.' },
 ]
 
 export default function HowToBuy() {
