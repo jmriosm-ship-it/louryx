@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Bottle from '../components/Bottle'
 import { useCatalog } from '../context/CatalogContext'
-import { money, soldOut, STORE, wholesalePercent, wholesalePrice } from '../config'
+import { money, nextWholesaleTier, soldOut, STORE, wholesalePercentFor, wholesalePrice } from '../config'
 
 // El precio mayorista parte del precio normal, sin el descuento de tienda
 const base = (p) => p.originalPrice ?? p.price
@@ -49,8 +49,8 @@ export default function Wholesale() {
   const lines = useMemo(
     () => products.filter((p) => qty[p.id] > 0 && !soldOut(p)).map((p) => {
       const n = qty[p.id]
-      const pct = wholesalePercent(p)
-      const ws = n >= min
+      const pct = wholesalePercentFor(p, n)
+      const ws = pct > 0
       return { p, n, pct, ws, unit: ws ? wholesalePrice(base(p), pct) : base(p) }
     }),
     [qty, products, min],
@@ -106,7 +106,8 @@ export default function Wholesale() {
       </div>
       <p className="lead ws-intro">
         Pide <strong>{min} o más unidades de un mismo perfume</strong>, sin límite de cantidad, y ese perfume pasa solo a su precio mayorista.
-        Cada perfume tiene su propio descuento.
+        Cada perfume tiene su propio descuento, y si pides más, el precio baja otra vez:
+        {' '}desde <strong>{STORE.wholesaleTiers.slice(1).join(' y desde ')}</strong> unidades del mismo perfume.
       </p>
 
       <div className="checkout ws">
@@ -119,7 +120,9 @@ export default function Wholesale() {
           <ul className="ws-list">
             {list.map((p) => {
               const n = qty[p.id] || 0
-              const pct = wholesalePercent(p)
+              const pct = wholesalePercentFor(p, min)
+              const nowPct = wholesalePercentFor(p, n)
+              const next = nextWholesaleTier(n)
               return (
                 <li key={p.id} className={`${n ? 'has' : ''} ${soldOut(p) ? 'out' : ''}`}>
                   <span className="ws-media"><Bottle product={p} className="ws-img" /></span>
@@ -132,7 +135,8 @@ export default function Wholesale() {
                     </span>
                     {n > 0 && !soldOut(p) && (
                       <small className={`ws-hint ${n >= min ? 'ok' : ''}`}>
-                        {n >= min ? '✓ Precio mayorista aplicado' : `Agrega ${min - n} más para el precio mayorista`}
+                        {n >= min ? `✓ Precio mayorista aplicado (-${nowPct}%)` : `Agrega ${min - n} más para el precio mayorista`}
+                        {n >= min && next ? ` · agrega ${next.from - n} más y baja a ${money(wholesalePrice(base(p), wholesalePercentFor(p, next.from)))} c/u` : ''}
                       </small>
                     )}
                   </span>

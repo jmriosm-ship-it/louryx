@@ -39,6 +39,8 @@ function build(raw) {
       stock: row.stock ?? 20,
       wholesale: row.wholesale !== false,
       wholesaleDiscount: Number(row.wholesale_discount) || undefined,
+      wholesaleDiscount12: Number(row.wholesale_discount_12) || undefined,
+      wholesaleDiscount30: Number(row.wholesale_discount_30) || undefined,
       badge: row.badge || undefined,
       vendido: Boolean(row.featured),
       nuevo: Boolean(row.is_new),

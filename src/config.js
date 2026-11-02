@@ -28,6 +28,9 @@ export const STORE = {
   // Para cambiar el descuento, pon el porcentaje aquí en decimal (0.15 = 15%, 0.2 = 20%): se aplica solo en toda la tienda.
   wholesaleFrom: 3,
   wholesaleDiscount: 0.15,
+  // Escalones por cantidad de UN MISMO perfume (el primero es wholesaleFrom). El descuento de cada escalón
+  // se pone por perfume en el panel (pestaña Mayoristas). Si un escalón queda vacío, ese perfume mantiene el descuento del anterior.
+  wholesaleTiers: [3, 12, 30],
   // Marcas de la cinta de la portada: deja solo las que vendes.
   brands: ['ARMAF', 'LATTAFA', 'AFNAN', 'RASASI', 'MAISON ALHAMBRA', 'PARIS CORNER'],
   logo: asset('/brand/logo.jpg'),
@@ -41,3 +44,20 @@ export const wholesalePrice = (price, pct = Math.round(STORE.wholesaleDiscount *
 
 // Descuento mayorista de un perfume, en %: el que se le puso en el panel (pestaña Mayoristas) o, si no tiene, el general.
 export const wholesalePercent = (p) => (Number(p?.wholesaleDiscount) > 0 ? Number(p.wholesaleDiscount) : Math.round(STORE.wholesaleDiscount * 100))
+
+// Descuento de un perfume según las unidades pedidas: 0 si no llega al mínimo, y sube en cada escalón.
+// Un escalón sin descuento propio (vacío en el panel) repite el del escalón anterior.
+export const wholesalePercentFor = (p, n) => {
+  const [t1, t2, t3] = STORE.wholesaleTiers
+  if (n < t1) return 0
+  const d1 = wholesalePercent(p)
+  const d2 = Number(p?.wholesaleDiscount12) > 0 ? Number(p.wholesaleDiscount12) : d1
+  const d3 = Number(p?.wholesaleDiscount30) > 0 ? Number(p.wholesaleDiscount30) : d2
+  return n >= t3 ? d3 : n >= t2 ? d2 : d1
+}
+
+// Siguiente escalón que todavía no alcanza esa cantidad (para el aviso "agrega X más"), o null.
+export const nextWholesaleTier = (n) => {
+  const from = STORE.wholesaleTiers.find((t) => n < t)
+  return from ? { from } : null
+}

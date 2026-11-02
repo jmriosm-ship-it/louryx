@@ -47,6 +47,10 @@ alter table public.louryx_products add column if not exists discount_percent int
 -- Descuento mayorista de este perfume (1 a 90). Se aplica solo en la página de Mayoristas. Sin valor = usa el general.
 alter table public.louryx_products add column if not exists wholesale_discount integer check (wholesale_discount between 1 and 90);
 
+-- Descuento mayorista de los escalones de 12 y de 30 unidades (1 a 90). Sin valor = repite el del escalón anterior.
+alter table public.louryx_products add column if not exists wholesale_discount_12 integer check (wholesale_discount_12 between 1 and 90);
+alter table public.louryx_products add column if not exists wholesale_discount_30 integer check (wholesale_discount_30 between 1 and 90);
+
 -- Quiénes son administradores (los dueños)
 create table if not exists public.louryx_admins (
   user_id uuid primary key references auth.users(id) on delete cascade

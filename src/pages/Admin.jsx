@@ -121,9 +121,9 @@ function Panel() {
   const setStock = (p, n) => attempt(() => store.saveProduct({ id: p.id, stock: Math.max(0, n) }), 'Cantidad actualizada')
   const saveWholesale = (p, patch) => attempt(() => store.saveProduct({ id: p.id, ...patch }), 'Mayorista guardado')
   // Pone el mismo descuento mayorista a todos los perfumes (o lo quita si va vacío)
-  const applyWholesaleToAll = (pct) =>
-    window.confirm(pct ? `¿Poner ${pct}% de descuento mayorista a los ${data.products.length} perfumes?` : '¿Quitar el descuento propio de todos los perfumes? Usarán el general.') &&
-    attempt(async () => { for (const p of data.products) await store.saveProduct({ id: p.id, wholesale_discount: pct || null }) }, 'Descuento mayorista aplicado')
+  const applyWholesaleToAll = (vals) =>
+    window.confirm(`¿Poner estos descuentos mayoristas a los ${data.products.length} perfumes? Los escalones vacíos se borran.`) &&
+    attempt(async () => { for (const p of data.products) await store.saveProduct({ id: p.id, ...vals }) }, 'Descuento mayorista aplicado')
   const removeProduct = (p) => window.confirm(`¿Borrar "${p.name}" para siempre?`) && attempt(() => store.deleteProduct(p.id), 'Perfume borrado')
   const removeCategory = (c) =>
     window.confirm(`¿Borrar la categoría "${c.name}"? Sus perfumes no se borran: quedan sin categoría.`) &&
@@ -268,13 +268,13 @@ function Panel() {
           {!loading && tab === 'mayoristas' && (
             <>
               <p className="ad-help">
-                Aquí decides, para cada perfume, si se vende al por mayor y cuánto descuento tiene. El descuento se aplica solo en la página de Mayoristas,
-                cuando piden {STORE.wholesaleFrom} o más unidades de ese perfume; en la tienda normal el precio no cambia.
-                Si dejas el descuento vacío, se usa el general ({Math.round(STORE.wholesaleDiscount * 100)}%).
+                Aquí decides, para cada perfume, si se vende al por mayor y el descuento de cada escalón: desde {STORE.wholesaleTiers[0]}, desde {STORE.wholesaleTiers[1]} y desde {STORE.wholesaleTiers[2]} unidades
+                de ese mismo perfume. Se aplica solo en la página de Mayoristas; en la tienda normal el precio no cambia.
+                Si dejas el primero vacío, se usa el general ({Math.round(STORE.wholesaleDiscount * 100)}%); un escalón vacío repite el anterior.
               </p>
               {data.products.length > 0 && <WholesaleBulk onApply={applyWholesaleToAll} />}
               <ul className="ad-list ad-list--ws">
-                {prods.map((p) => <WholesaleRow key={`${p.id}-${p.wholesale}-${p.wholesale_discount ?? ''}`} p={p} onSave={(patch) => saveWholesale(p, patch)} />)}
+                {prods.map((p) => <WholesaleRow key={`${p.id}-${p.wholesale}-${p.wholesale_discount ?? ''}-${p.wholesale_discount_12 ?? ''}-${p.wholesale_discount_30 ?? ''}`} p={p} onSave={(patch) => saveWholesale(p, patch)} />)}
                 {prods.length === 0 && <li className="ad-empty">Todavía no hay perfumes. Crea el primero en la pestaña Perfumes.</li>}
               </ul>
             </>
@@ -495,31 +495,36 @@ function CategoryForm({ initial, onSaved, onCancel }) {
   )
 }
 
-// Aplicar el mismo descuento mayorista a todos los perfumes
+const KEYS = ['wholesale_discount', 'wholesale_discount_12', 'wholesale_discount_30']
+const toPct = (v) => (Number(v) > 0 ? Math.min(90, Math.max(1, Math.round(Number(v)))) : null)
+
+// Aplicar los mismos descuentos mayoristas a todos los perfumes
 function WholesaleBulk({ onApply }) {
-  const [pct, setPct] = useState('')
+  const [v, setV] = useState(['', '', ''])
   return (
     <div className="ad-bulk">
-      <label>Mismo descuento para todos (%)
-        <input type="number" min="1" max="90" step="1" inputMode="numeric" value={pct} placeholder="Ej. 15" onChange={(e) => setPct(e.target.value)} />
-      </label>
-      <button type="button" className="ad-btn" onClick={() => onApply(pct ? Math.min(90, Math.max(1, Math.round(Number(pct)))) : null)}>
-        {pct ? 'Aplicar a todos' : 'Quitar el descuento propio de todos'}
-      </button>
+      {STORE.wholesaleTiers.map((t, i) => (
+        <label key={t}>Desde {t} u. (%)
+          <input type="number" min="1" max="90" step="1" inputMode="numeric" value={v[i]} placeholder={i === 0 ? `Ej. ${Math.round(STORE.wholesaleDiscount * 100)}` : 'Vacío'} onChange={(e) => setV(v.map((x, k) => (k === i ? e.target.value : x)))} />
+        </label>
+      ))}
+      <button type="button" className="ad-btn" onClick={() => onApply(Object.fromEntries(KEYS.map((k, i) => [k, toPct(v[i])])))}>Aplicar a todos</button>
     </div>
   )
 }
 
-// Una fila de la pestaña Mayoristas: si el perfume se vende al por mayor y su descuento
+// Una fila de la pestaña Mayoristas: si el perfume se vende al por mayor y el descuento de cada escalón
 function WholesaleRow({ p, onSave }) {
-  const [pct, setPct] = useState(p.wholesale_discount ?? '')
+  const [v, setV] = useState(KEYS.map((k) => p[k] ?? ''))
   const general = Math.round(STORE.wholesaleDiscount * 100)
-  const shown = Number(pct) > 0 ? Math.min(90, Math.round(Number(pct))) : general
   const price = Number(p.price) || 0
+  const d1 = toPct(v[0]) ?? general
+  const d2 = toPct(v[1]) ?? d1
+  const shown = [d1, d2, toPct(v[2]) ?? d2]
 
-  const commit = () => {
-    const next = Number(pct) > 0 ? Math.min(90, Math.max(1, Math.round(Number(pct)))) : null
-    if (next !== (p.wholesale_discount ?? null)) onSave({ wholesale_discount: next })
+  const commit = (i) => {
+    const next = toPct(v[i])
+    if (next !== (p[KEYS[i]] ?? null)) onSave({ [KEYS[i]]: next })
   }
 
   return (
@@ -528,17 +533,19 @@ function WholesaleRow({ p, onSave }) {
       <span className="ad-list__info">
         <strong>{p.name}</strong>
         <small>Precio normal {money(price)}</small>
-        {p.wholesale && <small>Desde {STORE.wholesaleFrom} unidades: {money(wholesalePrice(price, shown))} c/u ({shown}% menos){Number(pct) > 0 ? '' : ' · descuento general'}</small>}
+        {p.wholesale && <small>{STORE.wholesaleTiers.map((t, i) => `Desde ${t}: ${money(wholesalePrice(price, shown[i]))}`).join(' · ')} c/u</small>}
       </span>
       <label className="ad-check ad-ws-on">
         <input type="checkbox" checked={Boolean(p.wholesale)} onChange={(e) => onSave({ wholesale: e.target.checked })} /> Al por mayor
       </label>
-      <label className="ad-ws-pct">Descuento (%)
-        <input
-          type="number" min="1" max="90" step="1" inputMode="numeric" value={pct} placeholder={`General ${general}`} disabled={!p.wholesale}
-          onChange={(e) => setPct(e.target.value)} onBlur={commit} onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-        />
-      </label>
+      {STORE.wholesaleTiers.map((t, i) => (
+        <label key={t} className="ad-ws-pct">Desde {t} u. (%)
+          <input
+            type="number" min="1" max="90" step="1" inputMode="numeric" value={v[i]} placeholder={i === 0 ? `General ${general}` : 'Igual al anterior'} disabled={!p.wholesale}
+            onChange={(e) => setV(v.map((x, k) => (k === i ? e.target.value : x)))} onBlur={() => commit(i)} onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+          />
+        </label>
+      ))}
     </li>
   )
 }
