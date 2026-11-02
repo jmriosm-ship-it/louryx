@@ -113,7 +113,7 @@ export default function Home() {
       </section>
 
       <section className="brand-band">
-        <img className="brand-band-img" src={asset('/brand/fondo-louryx.jpg')} alt="Frasco de perfume Louryx entre humo" />
+        <img className="brand-band-img" src={asset('/brand/local-louryx.jpg')} alt="Local de Louryx con los estantes de perfumes y el logo en la pared" />
         <div className="container brand-band-in">
           <h2>
             <span className="l1">Porque un perfume</span>
@@ -127,14 +127,14 @@ export default function Home() {
 
       <section className="section container">
         <div className="section-head">
-          <div><p className="eyebrow">Colecciones</p><h2>Elige tu estilo</h2></div>
+          <div><p className="eyebrow">Colecciones</p><h2 className="display">Elige tu estilo</h2></div>
         </div>
         <Collections />
       </section>
 
       <section className="section container">
         <div className="section-head">
-          <div><p className="eyebrow">Selección</p><h2>Más vendidos</h2></div>
+          <div><p className="eyebrow">Selección</p><h2 className="display">Más vendidos</h2></div>
           <Link to="/catalogo" className="link">Ver todo →</Link>
         </div>
         <div className="feat">

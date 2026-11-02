@@ -35,7 +35,7 @@ export default function Recommender() {
       <div className="container rec">
         <div className="rec-intro">
           <p className="eyebrow">Asesoría personalizada</p>
-          <h2>Te ayudamos a elegir</h2>
+          <h2 className="display">Te ayudamos a elegir</h2>
           <p className="lead">Responde 4 preguntas rápidas y te enviamos una recomendación personal por WhatsApp.</p>
         </div>
         <div className="rec-form">

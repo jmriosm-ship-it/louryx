@@ -12,7 +12,7 @@ export default function HowToBuy() {
   return (
     <section className="section container" id="como-comprar">
       <div className="section-head">
-        <div><p className="eyebrow">Compra fácil</p><h2>¡Comprar es muy fácil!</h2></div>
+        <div><p className="eyebrow">Compra fácil</p><h2 className="display">¡Comprar es muy fácil!</h2></div>
         <Link to="/catalogo" className="link">Ver catálogo →</Link>
       </div>
       <ol className="how">
