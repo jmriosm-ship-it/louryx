@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
-import { products, CATEGORIES, FAMILIES } from '../data/products'
+import { useCatalog } from '../context/CatalogContext'
 
 const SORTS = {
   destacados: ['Destacados', () => 0],
@@ -11,6 +11,7 @@ const SORTS = {
 }
 
 export default function Catalog() {
+  const { products, categories: CATEGORIES, families: FAMILIES } = useCatalog()
   const [params, setParams] = useSearchParams()
   const cat = params.get('cat') || ''
   const fam = params.get('fam') || ''
@@ -29,7 +30,7 @@ export default function Catalog() {
       .filter((p) => (!cat || p.category === cat) && (!fam || p.family === fam))
       .filter((p) => !term || [p.name, p.family, p.category, ...Object.values(p.notes).flat()].join(' ').toLowerCase().includes(term))
       .sort((SORTS[sort] || SORTS.destacados)[1])
-  }, [cat, fam, q, sort])
+  }, [products, cat, fam, q, sort])
 
   return (
     <section className="section container">

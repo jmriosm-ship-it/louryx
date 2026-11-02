@@ -5,12 +5,12 @@ import Collections from '../components/Collections'
 import HowToBuy from '../components/HowToBuy'
 import Recommender from '../components/Recommender'
 import Benefits from '../components/Benefits'
-import { products, CATEGORIES } from '../data/products'
+import { useCatalog } from '../context/CatalogContext'
 import { STORE, money, asset } from '../config'
 
 // Perfumes nuevos: los marcados con `nuevo: true` en products.js (el más reciente primero).
 // Si no hay ninguno marcado, se usan los últimos agregados al catálogo.
-const newest = () => {
+const newest = (products) => {
   const flagged = products.filter((p) => p.nuevo).reverse()
   return (flagged.length ? flagged : products.slice(-4).reverse()).slice(0, 6)
 }
@@ -32,7 +32,8 @@ function HeroSlide({ p, className }) {
 }
 
 export default function Home() {
-  const slides = newest()
+  const { products } = useCatalog()
+  const slides = newest(products)
   // dir: 1 = entra desde la derecha, -1 = desde la izquierda, 0 = primera carga. from: el que se está yendo.
   const [view, setView] = useState({ i: 0, dir: 0, from: null })
   const [paused, setPaused] = useState(false)
