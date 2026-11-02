@@ -63,6 +63,12 @@ export default function Home() {
 
   return (
     <>
+      <div className="tagline">
+        <i aria-hidden="true" />
+        <p>Tu personalidad merece destacar en cada ocasión</p>
+        <img src={asset('/brand/perfume-lx.jpg')} alt="Perfume Louryx" />
+        <i aria-hidden="true" />
+      </div>
       <section className="hero" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
         <div className="container hero-stage">
           <svg className="hero-tri" viewBox="0 0 300 260" aria-hidden="true">
