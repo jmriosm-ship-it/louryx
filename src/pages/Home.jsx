@@ -64,10 +64,12 @@ export default function Home() {
   return (
     <>
       <div className="tagline">
-        <i aria-hidden="true" />
+        <div className="tagline-side l"><i aria-hidden="true" /></div>
         <p>Tu personalidad merece destacar en cada ocasión</p>
-        <img src={asset('/brand/perfume-lx.jpg')} alt="Perfume Louryx" />
-        <i aria-hidden="true" />
+        <div className="tagline-side r">
+          <i aria-hidden="true" />
+          <img src={asset('/brand/perfume-lx.jpg')} alt="Perfume Louryx" />
+        </div>
       </div>
       <section className="hero" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
         <div className="container hero-stage">

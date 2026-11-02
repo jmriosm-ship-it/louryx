@@ -649,3 +649,13 @@ img.ws-img { mix-blend-mode: screen; }
 /* Franja más alta: el perfume queda al lado de la frase y la portada baja */
 .tagline { min-height: clamp(120px, 12vw, 170px); padding-block: 14px; }
 .tagline img { top: 50%; margin-top: 0; transform: translateY(-50%); height: clamp(104px, 10.5vw, 150px); right: clamp(24px, 8vw, 150px); }
+
+/* La franja ya no usa posiciones fijas: tres columnas (línea · frase · línea + perfume) que nunca se superponen */
+.tagline { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: clamp(12px, 2vw, 28px); align-items: center; justify-content: normal; }
+.tagline-side { display: flex; align-items: center; gap: clamp(10px, 1.6vw, 24px); min-width: 0; }
+.tagline-side.l { justify-content: flex-end; }
+.tagline-side i { flex: 1 1 0; min-width: 0; max-width: 220px; }
+.tagline-side.l i { margin-left: auto; }
+.tagline img { position: static; transform: none; margin: 0; flex: none; height: clamp(84px, 9vw, 150px); width: auto; }
+@media (max-width: 1100px) { .tagline p { letter-spacing: 0.14em; } .tagline img { height: clamp(72px, 8vw, 96px); } }
+@media (max-width: 700px) { .tagline { display: flex; } .tagline-side { display: none; } }
