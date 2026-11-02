@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import * as store from '../lib/catalogStore'
+import { cutoutFile } from '../lib/cutout'
 import { useCatalog } from '../context/CatalogContext'
 import { products as EXAMPLE_PRODUCTS, CATEGORIES as EXAMPLE_CATEGORIES, FAMILIES } from '../data/products'
 import { STORE, asset, money, wholesalePercent, wholesalePrice } from '../config'
@@ -293,8 +294,9 @@ function Thumb({ src }) {
 }
 
 // Fotos: la primera es la portada. Con `single` solo se puede tener una (se reemplaza al subir otra).
-function PhotoList({ photos, onChange, single = false, addLabel = '+ Foto', main = false }) {
+function PhotoList({ photos, onChange, single = false, addLabel = '+ Foto', main = false, cutout = false }) {
   const [busy, setBusy] = useState(false)
+  const [noBg, setNoBg] = useState(true)
   const [error, setError] = useState('')
 
   const add = async (e) => {
@@ -305,7 +307,16 @@ function PhotoList({ photos, onChange, single = false, addLabel = '+ Foto', main
     setError('')
     try {
       const urls = []
-      for (const f of single ? files.slice(0, 1) : files) urls.push(await store.uploadImage(f))
+      for (let f of single ? files.slice(0, 1) : files) {
+        if (cutout && noBg) {
+          try {
+            f = await cutoutFile(f)
+          } catch (err) {
+            setError(`No pude quitar el fondo (${err.message}). Subí la foto tal cual: usa una con fondo liso o recórtala antes.`)
+          }
+        }
+        urls.push(await store.uploadImage(f))
+      }
       onChange(single ? urls : [...photos, ...urls])
     } catch (err) {
       setError(`No se pudo subir la foto: ${err.message || 'error'}`)
@@ -321,6 +332,9 @@ function PhotoList({ photos, onChange, single = false, addLabel = '+ Foto', main
 
   return (
     <>
+      {cutout && (
+        <label className="ad-check"><input type="checkbox" checked={noBg} onChange={(e) => setNoBg(e.target.checked)} /> Quitar el fondo de la foto al subirla (para que salga limpia en la portada)</label>
+      )}
       <div className="ad-photos">
         {photos.map((src, i) => (
           <div className="ad-photo" key={src + i}>
@@ -443,12 +457,12 @@ function ProductForm({ initial, cats, onSaved, onCancel }) {
       <div className="ad-checks">
         <label className="ad-check"><input type="checkbox" checked={f.active} onChange={(e) => set({ active: e.target.checked })} /> Visible en la tienda</label>
         <label className="ad-check"><input type="checkbox" checked={f.featured} onChange={(e) => set({ featured: e.target.checked })} /> Más vendido</label>
-        <label className="ad-check"><input type="checkbox" checked={f.is_new} onChange={(e) => set({ is_new: e.target.checked })} /> Nuevo ingreso</label>
+        <label className="ad-check"><input type="checkbox" checked={f.is_new} onChange={(e) => set({ is_new: e.target.checked })} /> Nuevo ingreso (sale en la portada de inicio)</label>
       </div>
 
       <h3>Portada</h3>
       <p className="ad-help">Es la foto principal del perfume: sale en el inicio, en el carrusel, en las tarjetas y como foto grande en su página. Mejor con fondo transparente o liso. Si subes otra, reemplaza a la anterior.</p>
-      <PhotoList photos={f.cover ? [f.cover] : []} single addLabel="+ Portada" main onChange={(a) => set({ cover: a[0] || '' })} />
+      <PhotoList photos={f.cover ? [f.cover] : []} single addLabel="+ Portada" main cutout onChange={(a) => set({ cover: a[0] || '' })} />
 
       <h3>Fotos secundarias</h3>
       <p className="ad-help">Otros ángulos o detalles (caja, tamaño, en mano…). En la página del perfume salen como miniaturas debajo de la foto grande.</p>

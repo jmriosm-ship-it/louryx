@@ -134,7 +134,7 @@ export default function Wholesale() {
                     {n > 0 && !soldOut(p) && (
                       <small className={`ws-hint ${ready ? 'ok' : ''}`}>
                         {ready ? `✓ Precio mayorista aplicado (-${nowPct}%)` : `${min - units === 1 ? 'Falta 1 unidad' : 'Faltan ' + (min - units) + ' unidades'} en total para el precio mayorista`}
-                        {ready && next ? ` · agrega ${next.from - n} más de este y baja a ${money(wholesalePrice(base(p), wholesalePercentFor(p, next.from)))} c/u` : ''}
+                        {ready && next && wholesalePercentFor(p, next.from) > nowPct ?` · agrega ${next.from - n} más de este y baja a ${money(wholesalePrice(base(p), wholesalePercentFor(p, next.from)))} c/u` : ''}
                       </small>
                     )}
                   </span>
