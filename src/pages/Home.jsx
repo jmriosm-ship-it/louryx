@@ -19,7 +19,6 @@ function HeroSlide({ p, className }) {
   const out = className.includes('out')
   return (
     <div className={`hero-center ${className}`} aria-hidden={out || undefined}>
-      <p className="eyebrow">Nuevo ingreso</p>
       <Bottle product={p} className="hc-img" />
       <h1>{p.name}</h1>
       <p className="hc-price">{p.category} · {p.family} · {money(p.price)}</p>
