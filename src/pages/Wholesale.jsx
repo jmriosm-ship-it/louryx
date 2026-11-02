@@ -18,8 +18,8 @@ const load = () => {
 }
 
 // Pedido mayorista: es independiente del carrito normal. Cada perfume tiene su propio descuento
-// (se pone en el panel, pestaña Mayoristas) y se aplica solo cuando piden STORE.wholesaleFrom
-// o más unidades de ESE perfume. No hay máximo de unidades.
+// (se pone en el panel, pestaña Mayoristas). El precio mayorista se aplica cuando el pedido suma
+// STORE.wholesaleFrom o más unidades EN TOTAL, combinando cualquier referencia. No hay máximo.
 export default function Wholesale() {
   const { products: all, categories } = useCatalog()
   // Solo los perfumes marcados como "se puede al por mayor" (los de products.js cuentan como sí)
@@ -46,17 +46,17 @@ export default function Wholesale() {
   })
 
   // Cada línea lleva su propio precio: mayorista si llegó al mínimo de ese perfume, normal si no
+  const picked = useMemo(() => products.filter((p) => qty[p.id] > 0 && !soldOut(p)), [qty, products])
+  const units = picked.reduce((t, p) => t + qty[p.id], 0)
+  const ready = units >= min
   const lines = useMemo(
-    () => products.filter((p) => qty[p.id] > 0 && !soldOut(p)).map((p) => {
+    () => picked.map((p) => {
       const n = qty[p.id]
-      const pct = wholesalePercentFor(p, n)
-      const ws = pct > 0
-      return { p, n, pct, ws, unit: ws ? wholesalePrice(base(p), pct) : base(p) }
+      const pct = ready ? wholesalePercentFor(p, Math.max(n, min)) : 0
+      return { p, n, pct, ws: ready, unit: ready ? wholesalePrice(base(p), pct) : base(p) }
     }),
-    [qty, products, min],
+    [picked, qty, ready],
   )
-  const units = lines.reduce((s, l) => s + l.n, 0)
-  const ready = lines.some((l) => l.ws)
   const subtotal = lines.reduce((s, l) => s + l.n * l.unit, 0)
   const normal = lines.reduce((s, l) => s + l.n * base(l.p), 0)
   const on = (k) => (e) => setF({ ...f, [k]: e.target.value })
@@ -101,13 +101,11 @@ export default function Wholesale() {
       <div className="section-head">
         <div>
           <p className="eyebrow">Mayoristas</p>
-          <h1 className="h2">Compra al por mayor</h1>
+          <h1 className="h2 display">Compra al por mayor</h1>
         </div>
       </div>
       <p className="lead ws-intro">
-        Pide <strong>{min} o más unidades de un mismo perfume</strong>, sin límite de cantidad, y ese perfume pasa solo a su precio mayorista.
-        Cada perfume tiene su propio descuento, y si pides más, el precio baja otra vez:
-        {' '}desde <strong>{STORE.wholesaleTiers.slice(1).join(' y desde ')}</strong> unidades del mismo perfume.
+        Compra a precio mayorista desde <strong>{min} unidades</strong>. Puedes elegir cualquier referencia de nuestro catálogo y combinar diferentes perfumes para completar tu pedido, sin necesidad de repetir una misma referencia. Al completar las {min} unidades, cada perfume tendrá su respectivo precio mayorista, según la referencia elegida. Además, si pides <strong>{STORE.wholesaleTiers.slice(1).join(' o ')} unidades o más de una misma referencia</strong>, ese perfume baja de precio otra vez.
       </p>
 
       <div className="checkout ws">
@@ -121,8 +119,8 @@ export default function Wholesale() {
             {list.map((p) => {
               const n = qty[p.id] || 0
               const pct = wholesalePercentFor(p, min)
-              const nowPct = wholesalePercentFor(p, n)
-              const next = nextWholesaleTier(n)
+              const nowPct = wholesalePercentFor(p, Math.max(n, min))
+              const next = nextWholesaleTier(Math.max(n, min))
               return (
                 <li key={p.id} className={`${n ? 'has' : ''} ${soldOut(p) ? 'out' : ''}`}>
                   <span className="ws-media"><Bottle product={p} className="ws-img" /></span>
@@ -134,9 +132,9 @@ export default function Wholesale() {
                       <em className="ws-tag">-{pct}% desde {min}</em>
                     </span>
                     {n > 0 && !soldOut(p) && (
-                      <small className={`ws-hint ${n >= min ? 'ok' : ''}`}>
-                        {n >= min ? `✓ Precio mayorista aplicado (-${nowPct}%)` : `Agrega ${min - n} más para el precio mayorista`}
-                        {n >= min && next ? ` · agrega ${next.from - n} más y baja a ${money(wholesalePrice(base(p), wholesalePercentFor(p, next.from)))} c/u` : ''}
+                      <small className={`ws-hint ${ready ? 'ok' : ''}`}>
+                        {ready ? `✓ Precio mayorista aplicado (-${nowPct}%)` : `${min - units === 1 ? 'Falta 1 unidad' : 'Faltan ' + (min - units) + ' unidades'} en total para el precio mayorista`}
+                        {ready && next ? ` · agrega ${next.from - n} más de este y baja a ${money(wholesalePrice(base(p), wholesalePercentFor(p, next.from)))} c/u` : ''}
                       </small>
                     )}
                   </span>
@@ -167,10 +165,10 @@ export default function Wholesale() {
           <h3>Tu pedido mayorista</h3>
           <p className="muted">
             {lines.length === 0
-              ? `Elige los perfumes y la cantidad. Desde ${min} unidades de un mismo perfume tiene precio mayorista.`
+              ? `Elige los perfumes y la cantidad. Desde ${min} unidades en total, combinando las referencias que quieras, cada perfume pasa a su precio mayorista.`
               : ready
-                ? '¡Listo! Los perfumes con ✓ ya tienen precio mayorista.'
-                : `Pide ${min} o más unidades de un mismo perfume para el precio mayorista.`}
+                ? '¡Listo! Todos los perfumes de tu pedido ya tienen su precio mayorista.'
+                : `Llevas ${units} de ${min} unidades. Agrega ${min - units} más, de cualquier referencia, para el precio mayorista.`}
           </p>
           {lines.length > 0 && (
             <ul>
@@ -193,7 +191,7 @@ export default function Wholesale() {
             <label>Dirección<input required value={f.direccion} onChange={on('direccion')} autoComplete="street-address" /></label>
             <label>Notas (opcional)<textarea rows="2" value={f.notas} onChange={on('notas')} /></label>
             <button className="btn btn-block" disabled={!ready}>
-              {ready ? 'Enviar pedido por WhatsApp' : `Pide ${min} o más de un mismo perfume`}
+              {ready ? 'Enviar pedido por WhatsApp' : `Completa ${min} unidades en total`}
             </button>
           </form>
           <p className="muted legal-note">Al enviar tu pedido aceptas la <Link to="/privacidad">política de privacidad</Link> y los <Link to="/terminos">términos y condiciones</Link>.</p>
