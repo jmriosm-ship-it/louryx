@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { products as STATIC, CATEGORIES as STATIC_CATS, FAMILIES } from '../data/products'
+import { BUNDLES as STATIC_BUNDLES } from '../data/bundles'
 import { listAll } from '../lib/catalogStore'
 import { hasBackend } from '../lib/supabase'
 import { STORE } from '../config'
@@ -9,9 +10,22 @@ import { STORE } from '../config'
 const CatalogContext = createContext(null)
 const NO_NOTES = { salida: [], corazon: [], fondo: [] }
 
+// Combos y kits creados en el panel; si no hay ninguno se usan los de ejemplo de src/data/bundles.js
+const bundlesOf = (raw) => (raw?.bundles?.length
+  ? raw.bundles.filter((b) => b.active !== false).map((b) => ({
+    id: String(b.id), type: b.type, name: b.name, blurb: b.blurb || '', off: Number(b.discount_percent) || 0, items: b.items || [],
+  }))
+  : STATIC_BUNDLES)
+// Ajustes: oferta relámpago encendida (por defecto sí), su hora de fin (vacía = termina cada día a las 11:59 pm) y fotos del menú
+const settingsOf = (raw) => ({
+  flashActive: raw?.settings?.flash_active !== false,
+  flashEndsAt: raw?.settings?.flash_ends_at || null,
+  covers: raw?.settings?.covers || {},
+})
+
 function build(raw) {
   if (!raw || !raw.products.some((p) => p.active)) {
-    return { products: STATIC, categories: STATIC_CATS, categoryPhotos: {}, source: 'static' }
+    return { products: STATIC, categories: STATIC_CATS, categoryPhotos: {}, bundles: bundlesOf(raw), settings: settingsOf(raw), source: 'static' }
   }
   const cats = raw.categories.filter((c) => c.active)
   const byId = new Map(raw.categories.map((c) => [c.id, c]))
@@ -50,6 +64,8 @@ function build(raw) {
     products,
     categories: cats.map((c) => c.name),
     categoryPhotos: Object.fromEntries(cats.filter((c) => c.photo_url).map((c) => [c.name, c.photo_url])),
+    bundles: bundlesOf(raw),
+    settings: settingsOf(raw),
     source: 'db',
   }
 }

@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext'
 import { STORE, asset } from '../config'
 import { buildMenuItems } from './menuItems'
 import { useCatalog } from '../context/CatalogContext'
+import { useFlash } from '../lib/flash'
 
 export default function Header() {
   const { count, setOpen } = useCart()
@@ -15,7 +16,8 @@ export default function Header() {
   const [q, setQ] = useState('')
   const navigate = useNavigate()
   const catalog = useCatalog()
-  const items = useMemo(() => buildMenuItems(catalog), [catalog])
+  const { on: flashOn } = useFlash()
+  const items = useMemo(() => buildMenuItems({ ...catalog, flashOn }), [catalog, flashOn])
   const current = items[preview]
 
   useEffect(() => {
@@ -97,7 +99,7 @@ export default function Header() {
               <img key={current.title} className={`mega__img ${current.fit}`} src={asset(current.img)} alt="" />
               <div className="mega__cap">
                 <b>{current.title}</b>
-                <small>{current.count} fragancias</small>
+                <small>{current.label ?? `${current.count} fragancias`}</small>
               </div>
             </div>
           </div>

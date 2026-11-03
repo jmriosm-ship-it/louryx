@@ -728,3 +728,31 @@ img.ws-img { mix-blend-mode: screen; }
 .carrier.on .carrier-name { color: #fff; }
 .carrier:has(input:focus-visible) { outline: 2px solid #fff; outline-offset: 2px; }
 @media (max-width: 420px) { .carrier-opts { grid-template-columns: 1fr; } .carrier { grid-template-columns: 110px 1fr; justify-items: start; align-items: center; } }
+
+/* Combos, kits y oferta relámpago */
+.bundles { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+.bundle { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 20px; border: 1px solid #2a2a2a; background: linear-gradient(160deg, #141414, #080808); }
+.bundle-off { position: absolute; top: 12px; right: 12px; z-index: 2; background: #fff; color: #000; font-weight: 600; font-size: 0.8rem; padding: 4px 9px; }
+.bundle-art { display: flex; justify-content: center; align-items: flex-end; height: 170px; margin-bottom: 8px; }
+.bundle-bottle { height: 100%; width: auto; max-width: 36%; object-fit: contain; margin: 0 -2%; }
+.bundle-art .bundle-bottle:nth-child(2) { height: 112%; z-index: 1; }
+.bundle h3 { font: 500 1.5rem/1.1 var(--serif); margin: 0; }
+.bundle p { color: #9a9a9a; font-size: 0.85rem; margin: 0; }
+.bundle-list { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 3px; font-size: 0.8rem; color: #d0d0d0; }
+.bundle-list li::before { content: '✓ '; }
+.bundle-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; margin-top: auto; padding-top: 12px; }
+.bundle-foot strong { font-size: 1.15rem; }
+.bundle-foot s { color: #777; font-size: 0.8rem; margin-left: 8px; }
+.bundle-foot small { display: block; font-size: 0.72rem; color: #9a9a9a; margin-top: 2px; }
+.flash-head { align-items: flex-end; }
+.timer { display: flex; align-items: center; gap: 6px; }
+.timer div { border: 1px solid #fff; padding: 7px 11px; text-align: center; font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: #9a9a9a; min-width: 60px; }
+.timer b { display: block; font: 500 1.6rem/1.1 var(--serif); color: #fff; letter-spacing: 0; }
+@media (max-width: 520px) { .timer div { min-width: 48px; padding: 6px 7px; } .timer b { font-size: 1.25rem; } }
+
+/* Panel: pestaña Ofertas */
+.ad-h2 { font-size: 1.1rem; margin: 26px 0 4px; }
+.ad-box { border: 1px solid #ddd; background: #fafafa; padding: 14px; display: grid; gap: 12px; margin-top: 8px; }
+.ad-quick { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+.ad-quick > span { font-size: 12px; color: #666; }
+.ad-items { align-items: end; }

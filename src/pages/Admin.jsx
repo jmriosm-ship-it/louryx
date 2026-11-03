@@ -75,7 +75,7 @@ function Login() {
 
 function Panel() {
   const { reload: reloadShop } = useCatalog()
-  const [data, setData] = useState({ categories: [], products: [] })
+  const [data, setData] = useState({ categories: [], products: [], bundles: [], settings: {} })
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('perfumes')
   const [editing, setEditing] = useState(null) // { kind: 'product' | 'category', data }
@@ -177,6 +177,7 @@ function Panel() {
       </header>
 
       {editing?.kind === 'product' && <ProductForm initial={editing.data} cats={cats} onSaved={() => done('Perfume guardado')} onCancel={() => setEditing(null)} />}
+      {editing?.kind === 'bundle' && <BundleForm initial={editing.data} products={data.products} onSaved={() => done('Guardado')} onCancel={() => setEditing(null)} />}
       {editing?.kind === 'category' && <CategoryForm initial={editing.data} onSaved={() => done('Categoría guardada')} onCancel={() => setEditing(null)} />}
 
       {!editing && (
@@ -193,6 +194,7 @@ function Panel() {
             <button type="button" className={tab === 'perfumes' ? 'on' : ''} onClick={() => { setTab('perfumes'); setMsg('') }}>Perfumes ({data.products.length})</button>
             <button type="button" className={tab === 'categorias' ? 'on' : ''} onClick={() => { setTab('categorias'); setMsg('') }}>Categorías ({data.categories.length})</button>
             <button type="button" className={tab === 'mayoristas' ? 'on' : ''} onClick={() => { setTab('mayoristas'); setMsg('') }}>Mayoristas ({data.products.filter((p) => p.wholesale).length})</button>
+            <button type="button" className={tab === 'ofertas' ? 'on' : ''} onClick={() => { setTab('ofertas'); setMsg('') }}>Ofertas ({data.bundles.length})</button>
           </nav>
 
           {loading && <p>Cargando…</p>}
@@ -264,6 +266,16 @@ function Panel() {
                 {cats.length === 0 && <li className="ad-empty">Todavía no hay categorías. Crea la primera con “Nueva categoría”.</li>}
               </ul>
             </>
+          )}
+
+          {!loading && tab === 'ofertas' && (
+            <OffersTab
+              data={data}
+              onSettings={(patch) => attempt(() => store.saveSettings(patch), 'Guardado')}
+              onNew={(type) => setEditing({ kind: 'bundle', data: { type, name: '', blurb: '', off: 10, active: true, items: [{ id: '', qty: 1 }] } })}
+              onEdit={(b) => setEditing({ kind: 'bundle', data: { id: b.id, type: b.type, name: b.name, blurb: b.blurb ?? '', off: b.discount_percent ?? 0, active: b.active !== false, items: b.items?.length ? b.items.map((i) => ({ id: String(i.id), qty: i.qty })) : [{ id: '', qty: 1 }] } })}
+              onDelete={(b) => window.confirm(`¿Borrar "${b.name}"?`) && attempt(() => store.deleteBundle(b.id), 'Borrado')}
+            />
           )}
 
           {!loading && tab === 'mayoristas' && (
@@ -356,6 +368,174 @@ function PhotoList({ photos, onChange, single = false, addLabel = '+ Foto', main
       </div>
       {error && <p className="ad-error" role="alert">{error}</p>}
     </>
+  )
+}
+
+// Fecha y hora para el campo datetime-local (en la hora del computador)
+const toInput = (iso) => {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const p = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`
+}
+const fmt = (ms) => new Date(ms).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' })
+
+// Pestaña Ofertas: opciones fijas del menú (Combos, Oferta relámpago, Kits), la oferta relámpago y los combos y kits
+function OffersTab({ data, onSettings, onNew, onEdit, onDelete }) {
+  const st = data.settings || {}
+  const covers = st.covers || {}
+  const active = st.flash_active !== false
+  const [ends, setEnds] = useState(toInput(st.flash_ends_at))
+  const endMs = st.flash_ends_at ? new Date(st.flash_ends_at).getTime() : null
+  const over = endMs !== null && endMs <= Date.now()
+  const deals = data.products.filter((p) => p.active && Number(p.discount_percent) > 0 && Number(p.stock) > 0).length
+  const status = !active ? 'Apagada: no se ve en la tienda.'
+    : over ? 'Ya terminó: se quitó sola de la tienda. Ponle una hora nueva para volver a mostrarla.'
+      : deals === 0 ? 'Activa, pero ningún perfume tiene descuento, así que no se muestra todavía.'
+        : endMs ? `Activa hasta el ${fmt(endMs)}. Después se quita sola.` : 'Activa: termina cada día a las 11:59 pm y empieza de nuevo al día siguiente.'
+  const setEnd = (date) => {
+    setEnds(date ? toInput(date.toISOString()) : '')
+    onSettings({ flash_active: true, flash_ends_at: date ? date.toISOString() : null })
+  }
+  const inHours = (h) => new Date(Date.now() + h * 3600 * 1000)
+  const todayEnd = () => { const d = new Date(); d.setHours(23, 59, 0, 0); return d }
+  const priceOf = (b) => {
+    const full = (b.items || []).reduce((t, i) => t + (Number(data.products.find((p) => String(p.id) === String(i.id))?.price) || 0) * (Number(i.qty) || 0), 0)
+    return Math.round((full * (1 - (Number(b.discount_percent) || 0) / 100)) / 1000) * 1000
+  }
+  const nameOf = (id) => data.products.find((p) => String(p.id) === String(id))?.name || 'Perfume borrado'
+
+  return (
+    <>
+      <h2 className="ad-h2">Oferta relámpago</h2>
+      <p className="ad-help">Muestra los perfumes que tengan “Descuento %” puesto. Aparece en el menú, en el inicio y en su página mientras esté activa, y cuando llega la hora de fin se quita sola.</p>
+      <div className="ad-box">
+        <label className="ad-check ad-check--card">
+          <input type="checkbox" checked={active} onChange={(e) => onSettings({ flash_active: e.target.checked })} />
+          <span><b>Mostrar la oferta relámpago en la tienda</b><small className="ad-help">{status}</small></span>
+        </label>
+        <div className="ad-row">
+          <label>Termina el día y la hora
+            <input type="datetime-local" value={ends} onChange={(e) => setEnds(e.target.value)} />
+          </label>
+          <button type="button" className="ad-btn ad-btn--solid" disabled={!ends} onClick={() => setEnd(new Date(ends))}>Guardar hora</button>
+        </div>
+        <div className="ad-quick">
+          <span>Atajos:</span>
+          <button type="button" className="ad-btn" onClick={() => setEnd(todayEnd())}>Hasta hoy 11:59 pm</button>
+          <button type="button" className="ad-btn" onClick={() => setEnd(inHours(6))}>6 horas</button>
+          <button type="button" className="ad-btn" onClick={() => setEnd(inHours(24))}>24 horas</button>
+          <button type="button" className="ad-btn" onClick={() => setEnd(inHours(72))}>3 días</button>
+          <button type="button" className="ad-btn" onClick={() => setEnd(null)}>Sin hora (cada día a las 11:59 pm)</button>
+          <button type="button" className="ad-btn" onClick={() => onSettings({ flash_active: false })}>Quitar ahora</button>
+        </div>
+      </div>
+
+      <h2 className="ad-h2">Opciones fijas del menú</h2>
+      <p className="ad-help">Son las tres opciones de ofertas del menú “Colección”. Aquí cambias la foto que sale al pasar el mouse. Si no subes una, usan la de Louryx.</p>
+      <ul className="ad-list ad-list--cats">
+        {[['combo', 'Combos emprendedores', '/combos'], ['flash', 'Oferta relámpago', '/oferta-relampago'], ['kit', 'Kits', '/kits']].map(([key, title, to]) => (
+          <li key={key}>
+            <Thumb src={covers[key]} />
+            <span className="ad-list__info"><strong>{title}</strong><small>{to}</small></span>
+            <PhotoList photos={covers[key] ? [covers[key]] : []} single addLabel="+ Foto" onChange={(a) => onSettings({ covers: { ...covers, [key]: a[0] || '' } })} />
+          </li>
+        ))}
+      </ul>
+
+      <h2 className="ad-h2">Combos y kits</h2>
+      <p className="ad-help">
+        Cada combo o kit junta varios perfumes con un descuento extra. El precio se calcula solo con los precios de los perfumes.
+        {data.bundles.length === 0 && ' Todavía no has creado ninguno: la tienda muestra unos de ejemplo hasta que crees el primero.'}
+      </p>
+      <div className="ad-quick">
+        <button type="button" className="ad-btn ad-btn--solid" onClick={() => onNew('combo')}>+ Nuevo combo</button>
+        <button type="button" className="ad-btn ad-btn--solid" onClick={() => onNew('kit')}>+ Nuevo kit</button>
+      </div>
+      <ul className="ad-list">
+        {data.bundles.map((b) => (
+          <li key={b.id} className={b.active === false ? 'off' : ''}>
+            <span className="ad-thumb-empty">{b.type === 'kit' ? 'Kit' : 'Combo'}</span>
+            <span className="ad-list__info">
+              <strong>{b.name}</strong>
+              <small>{(b.items || []).map((i) => `${i.qty} × ${nameOf(i.id)}`).join(' · ') || 'Sin perfumes'}</small>
+              <small>{money(priceOf(b))}{b.discount_percent > 0 ? ` · ${b.discount_percent}% menos` : ''}{b.active === false ? ' · oculto' : ''}</small>
+            </span>
+            <button type="button" onClick={() => onEdit(b)}>Editar</button>
+            <button type="button" onClick={() => onDelete(b)}>Borrar</button>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
+// Formulario de combo o kit
+function BundleForm({ initial, products, onSaved, onCancel }) {
+  const [f, set, bind] = useForm(initial)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const kind = f.type === 'kit' ? 'kit' : 'combo'
+  const setItem = (i, patch) => set({ items: f.items.map((it, k) => (k === i ? { ...it, ...patch } : it)) })
+  const items = f.items.filter((it) => it.id && Number(it.qty) > 0)
+  const full = items.reduce((t, it) => t + (Number(products.find((p) => String(p.id) === String(it.id))?.price) || 0) * Number(it.qty), 0)
+  const off = Math.min(90, Math.max(0, Math.round(Number(f.off)) || 0))
+  const price = Math.round((full * (1 - off / 100)) / 1000) * 1000
+
+  const submit = async (e) => {
+    e.preventDefault()
+    if (!items.length) return setError('Agrega al menos un perfume.')
+    setBusy(true)
+    setError('')
+    try {
+      await store.saveBundle({
+        ...(f.id ? { id: f.id } : {}),
+        type: kind, name: f.name.trim(), blurb: f.blurb.trim() || null, discount_percent: off, active: f.active,
+        items: items.map((it) => ({ id: String(it.id), qty: Math.round(Number(it.qty)) })),
+      })
+      return onSaved()
+    } catch (err) {
+      setError(`No se pudo guardar: ${err.message || 'error'}`)
+      return setBusy(false)
+    }
+  }
+
+  return (
+    <form className="ad-form" onSubmit={submit}>
+      <h2>{f.id ? 'Editar' : 'Nuevo'} {kind === 'kit' ? 'kit' : 'combo'}</h2>
+      <div className="ad-row">
+        <label>Tipo
+          <select {...bind('type')}><option value="combo">Combo emprendedor</option><option value="kit">Kit</option></select>
+        </label>
+        <label>Nombre<input required autoFocus {...bind('name')} /></label>
+      </div>
+      <label>Descripción corta<textarea rows="2" {...bind('blurb')} /></label>
+
+      <h3>Perfumes que incluye</h3>
+      {products.length === 0 && <p className="ad-help">Primero crea perfumes en la pestaña Perfumes.</p>}
+      {f.items.map((it, i) => (
+        <div className="ad-row ad-items" key={i}>
+          <label>Perfume
+            <select value={it.id} onChange={(e) => setItem(i, { id: e.target.value })}>
+              <option value="">Elige un perfume</option>
+              {products.map((p) => <option key={p.id} value={String(p.id)}>{p.name} · {money(Number(p.price) || 0)}</option>)}
+            </select>
+          </label>
+          <label>Cantidad<input type="number" min="1" step="1" inputMode="numeric" value={it.qty} onChange={(e) => setItem(i, { qty: e.target.value })} /></label>
+          <button type="button" className="ad-btn" onClick={() => set({ items: f.items.filter((_, k) => k !== i) })}>Quitar</button>
+        </div>
+      ))}
+      <button type="button" className="ad-btn" onClick={() => set({ items: [...f.items, { id: '', qty: 1 }] })}>+ Agregar perfume</button>
+
+      <div className="ad-row">
+        <label>Descuento (%)<input type="number" min="0" max="90" step="1" inputMode="numeric" {...bind('off')} />
+          <small className="ad-help">{full > 0 ? `Suman ${money(full)} y quedan en ${money(price)}.` : 'Elige los perfumes para ver el precio.'}</small>
+        </label>
+        <label className="ad-check"><input type="checkbox" checked={f.active} onChange={(e) => set({ active: e.target.checked })} /> Visible en la tienda</label>
+      </div>
+      {error && <p className="ad-error" role="alert">{error}</p>}
+      <Actions busy={busy} onCancel={onCancel} />
+    </form>
   )
 }
 

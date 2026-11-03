@@ -5,6 +5,10 @@ import Collections from '../components/Collections'
 import HowToBuy from '../components/HowToBuy'
 import Recommender from '../components/Recommender'
 import Benefits from '../components/Benefits'
+import ProductCard from '../components/ProductCard'
+import { BundleGrid, useBundles } from './Bundles'
+import { Timer } from './Flash'
+import { useFlash } from '../lib/flash'
 import { useCatalog } from '../context/CatalogContext'
 import { STORE, money, asset } from '../config'
 
@@ -60,6 +64,10 @@ export default function Home() {
   const sold = products.filter((p) => p.vendido)
   const featured = (sold.length >= 5 ? sold : sold.concat(products.filter((p) => !p.vendido))).slice(0, 5)
   const [star, ...rest] = featured
+  const flash = useFlash()
+  const deals = flash.deals.slice(0, 4)
+  const hasCombos = useBundles('combo').length > 0
+  const hasKits = useBundles('kit').length > 0
 
   return (
     <>
@@ -158,6 +166,36 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {hasCombos && (
+        <section className="section container">
+          <div className="section-head">
+            <div><p className="eyebrow">Para revender</p><h2 className="display">Combos emprendedores</h2></div>
+            <Link to="/combos" className="link">Ver todos →</Link>
+          </div>
+          <BundleGrid type="combo" limit={3} />
+        </section>
+      )}
+
+      {flash.on && (
+        <section className="section container flash">
+          <div className="section-head flash-head">
+            <div><p className="eyebrow">Oferta relámpago</p><h2 className="display">Se acaba pronto</h2></div>
+            <Timer end={flash.end} />
+          </div>
+          <div className="grid">{deals.map((p) => <ProductCard key={p.id} product={p} />)}</div>
+        </section>
+      )}
+
+      {hasKits && (
+        <section className="section container">
+          <div className="section-head">
+            <div><p className="eyebrow">Para probar y regalar</p><h2 className="display">Kits</h2></div>
+            <Link to="/kits" className="link">Ver todos →</Link>
+          </div>
+          <BundleGrid type="kit" limit={3} />
+        </section>
+      )}
 
       <HowToBuy />
       <Recommender />
