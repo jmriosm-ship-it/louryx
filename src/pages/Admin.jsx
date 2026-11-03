@@ -391,7 +391,7 @@ function OffersTab({ data, onSettings, onNew, onEdit, onDelete }) {
   const deals = data.products.filter((p) => p.active && Number(p.discount_percent) > 0 && Number(p.stock) > 0).length
   const status = !active ? 'Apagada: no se ve en la tienda.'
     : over ? 'Ya terminó: se quitó sola de la tienda. Ponle una hora nueva para volver a mostrarla.'
-      : deals === 0 ? 'Activa, pero ningún perfume tiene descuento, así que no se muestra todavía.'
+      : deals === 0 ? 'Activa y visible, pero ningún perfume tiene descuento todavía: la tienda muestra el aviso “estamos preparando las ofertas”. Ponle “Descuento %” a un perfume para que aparezca.'
         : endMs ? `Activa hasta el ${fmt(endMs)}. Después se quita sola.` : 'Activa: termina cada día a las 11:59 pm y empieza de nuevo al día siguiente.'
   const setEnd = (date) => {
     setEnds(date ? toInput(date.toISOString()) : '')

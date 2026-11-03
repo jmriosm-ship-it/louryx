@@ -11,8 +11,8 @@ export const flashEnd = (endsAt) => {
   return d.getTime()
 }
 
-// Estado de la oferta relámpago: `on` es true solo si está encendida en el panel, no ha terminado su hora
-// y hay perfumes con descuento. Al llegar la hora de fin vuelve a calcularse sola y la oferta desaparece
+// Estado de la oferta relámpago: `on` es true mientras está encendida en el panel y no ha llegado su hora de fin
+// (aunque todavía no haya perfumes con descuento: entonces avisa que pronto hay ofertas). Al llegar la hora de fin vuelve a calcularse sola y la oferta desaparece
 // del menú, del inicio y de su página.
 export function useFlash() {
   const { products, settings } = useCatalog()
@@ -27,5 +27,5 @@ export function useFlash() {
   }, [end])
 
   const deals = products.filter((p) => p.discount > 0 && !soldOut(p)).sort((a, b) => b.discount - a.discount)
-  return { on: settings.flashActive && end > Date.now() && deals.length > 0, end, deals }
+  return { on: settings.flashActive && end > Date.now(), end, deals }
 }

@@ -183,7 +183,11 @@ export default function Home() {
             <div><p className="eyebrow">Oferta relámpago</p><h2 className="display">Se acaba pronto</h2></div>
             <Timer end={flash.end} />
           </div>
-          <div className="grid">{deals.map((p) => <ProductCard key={p.id} product={p} />)}</div>
+          {deals.length > 0 ? (
+            <div className="grid">{deals.map((p) => <ProductCard key={p.id} product={p} />)}</div>
+          ) : (
+            <p className="muted">Estamos preparando los perfumes de esta oferta. Vuelve en un rato o mira el <Link to="/catalogo" className="link">catálogo</Link>.</p>
+          )}
         </section>
       )}
 

@@ -37,8 +37,10 @@ export default function Flash() {
         </div>
         {on && <Timer end={end} />}
       </div>
-      {on ? (
+      {on && deals.length > 0 ? (
         <div className="grid">{deals.map((p) => <ProductCard key={p.id} product={p} />)}</div>
+      ) : on ? (
+        <p className="muted">Estamos preparando los perfumes de esta oferta. Vuelve en un rato o mira el <Link to="/catalogo" className="link">catálogo</Link>.</p>
       ) : (
         <p className="muted">Por ahora no hay una oferta relámpago activa. Mira el <Link to="/catalogo" className="link">catálogo</Link> o escríbenos por WhatsApp.</p>
       )}
