@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Bottle from './Bottle'
 import { useCart } from '../context/CartContext'
+import PaymentMethods from './PaymentMethods'
 import { money } from '../config'
 
 export default function CartDrawer() {
@@ -50,6 +51,7 @@ export default function CartDrawer() {
             <div className="drawer-foot">
               <div className="row"><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
               <Link className="btn btn-block" to="/checkout" onClick={() => setOpen(false)}>Finalizar pedido</Link>
+              <PaymentMethods />
             </div>
           </>
         )}
