@@ -270,9 +270,9 @@ select:focus, input:focus, textarea:focus { outline: none; border-color: var(--g
   .summary { position: static; }
   .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .values { grid-template-columns: 1fr; }
-  .col-row { height: auto; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 4px; }
-  .col-row::-webkit-scrollbar { display: none; }
-  .col-panel { flex: 0 0 62%; height: 280px; scroll-snap-align: start; }
+  /* En el celular las colecciones van una debajo de la otra, a todo el ancho: sin ensancharse al tocar */
+  .col-row { flex-direction: column; height: auto; }
+  .col-panel, .col-panel:hover, .col-panel:focus-visible { flex: none; width: 100%; height: 210px; }
   .col-go { opacity: 1; transform: none; padding: 6px 9px; }
   .col-c { letter-spacing: 0.12em; font-size: 0.64rem; }
   .footer-in { grid-template-columns: 1fr 1fr; }
