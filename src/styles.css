@@ -140,7 +140,7 @@ img.feat-mini, img.feat-bottle, img.card-bottle, img.hc-img, img.hs-img { mix-bl
 .hero-dots button.on::after { background: var(--gold); }
 @media (max-width: 700px) { .hero-stage { grid-template-columns: 1fr; } .hero-side { display: none; } }
 .strip { border-block: 1px solid var(--line); background: var(--bg-2); }
-.strip-in { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: 22px; font-size: 1.05rem; font-weight: 400; letter-spacing: 0.06em; color: #fff; }
+.strip-in { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: 22px; font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.02em; color: #fff; }
 
 .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
 .section-head .eyebrow { margin-bottom: 6px; }
