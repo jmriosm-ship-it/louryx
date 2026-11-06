@@ -198,13 +198,47 @@ function Panel() {
           newCats++
         }
         const old = byName[row.name.trim().toLowerCase()]
-        const saved = await store.saveProduct({ ...(old ? { id: old.id } : {}), ...row, category_id: key ? catIds[key] : old?.category_id ?? null })
+        if (old) { for (const k of Object.keys(row)) if (row[k] === undefined || row[k] === null || row[k] === '') delete row[k] }
+        const saved = await store.saveProduct({ ...(old ? { id: old.id } : { price: 0 }), ...Object.fromEntries(Object.entries(row).filter(([, v]) => v !== undefined)), category_id: key ? catIds[key] : old?.category_id ?? null })
         byName[row.name.trim().toLowerCase()] = saved
         old ? updated++ : created++
       }
       await done(`Listo: ${created} perfumes nuevos, ${updated} actualizados y ${newCats} categorías nuevas.${errors.length ? ` Saltadas: ${errors.slice(0, 3).join(' · ')}` : ''}`)
     } catch (err) {
       setMsg(`No se pudo importar: ${err.message || 'error'}`)
+    } finally {
+      setImporting(false)
+    }
+  }
+
+  // Sube muchas fotos de una vez: cada archivo se une al perfume cuyo nombre coincide con el nombre del archivo
+  // (ej. "orientica-royal-bleu.png" -> "Orientica Royal Bleu"). A las categorías sin foto se les pone la del primer perfume.
+  const slug = (t) => String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  const importPhotos = async (e) => {
+    const files = [...(e.target.files || [])]
+    e.target.value = ''
+    if (!files.length) return
+    setImporting(true)
+    setMsg('')
+    try {
+      const byName = {}
+      for (const p of data.products) byName[slug(p.name)] = p
+      const catPhoto = {}
+      let ok = 0
+      const missing = []
+      for (const [i, f] of files.entries()) {
+        const p = byName[slug(f.name.replace(/.[^.]+$/, '').replace(/-d+$/, ''))] || byName[slug(f.name.replace(/.[^.]+$/, ''))]
+        if (!p) { missing.push(f.name); continue }
+        setMsg(`Subiendo fotos… ${i + 1} de ${files.length}`)
+        const url = await store.uploadImage(f)
+        await store.saveProduct({ id: p.id, image_url: url })
+        if (p.category_id && !catPhoto[p.category_id]) catPhoto[p.category_id] = url
+        ok++
+      }
+      for (const c of data.categories) if (!c.photo_url && catPhoto[c.id]) await store.saveCategory({ id: c.id, photo_url: catPhoto[c.id] })
+      await done(`Listo: ${ok} fotos puestas.${missing.length ? ` Sin perfume con ese nombre (${missing.length}): ${missing.slice(0, 5).join(', ')}` : ''}`)
+    } catch (err) {
+      setMsg(`No se pudieron subir las fotos: ${err.message || 'error'}`)
     } finally {
       setImporting(false)
     }
@@ -254,6 +288,10 @@ function Panel() {
                 <label className="lxp-link" style={{ cursor: 'pointer' }}>
                   {importing ? 'Subiendo…' : 'Subir archivo'}
                   <input type="file" accept=".csv,text/csv" hidden disabled={importing} onChange={importFile} />
+                </label>{' · '}
+                <label className="ad-link" style={{ cursor: 'pointer' }}>
+                  {importing ? 'Subiendo…' : 'Subir fotos (varias)'}
+                  <input type="file" accept="image/*" multiple hidden disabled={importing} onChange={importPhotos} />
                 </label>
               </div>
               {data.categories.length > 1 && (

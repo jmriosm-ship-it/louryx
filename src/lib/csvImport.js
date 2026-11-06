@@ -44,17 +44,16 @@ export function parseCsv(text) {
 const yes = (v) => /^(si|s|1|true|x|yes)$/.test(norm(v))
 const num = (v) => Number(String(v).replace(/[^0-9.,-]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.')) || 0
 
-// Convierte una fila en los campos de un perfume. Devuelve { error } si falta algo imprescindible.
+// Convierte una fila en los campos de un perfume. Solo el nombre es obligatorio; sin precio queda en 0 (se corrige después en el panel).
 export function rowToProduct(r, line) {
   const name = r.nombre || r.name
   const price = num(r.precio || r.price)
   if (!name) return { error: `Fila ${line}: falta el nombre` }
-  if (!price) return { error: `Fila ${line} (${name}): falta el precio` }
   const disc = num(r.descuento)
   return {
     category: r.categoria || '',
     row: {
-      name, price, description: r.descripcion || '', family: r.familia || null, badge: r.etiqueta || null,
+      name, price: price || undefined, description: r.descripcion || '', family: r.familia || null, badge: r.etiqueta || null,
       size_ml: num(r.tamano_ml || r.tamano || r.ml) || 100,
       stock: Math.max(0, Math.round(num(r.cantidad || r.stock)) || 0),
       discount_percent: disc > 0 ? Math.min(90, Math.round(disc)) : null,
