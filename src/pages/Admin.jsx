@@ -35,13 +35,13 @@ export default function Admin() {
   else if (!store.isLocal && !admin) {
     body = (
       <>
-        <p className="ad-error">Esta cuenta ({session.user.email}) no tiene permiso de administrador.</p>
-        <button type="button" className="ad-btn" onClick={store.signOut}>Salir</button>
+        <p className="lxp-error">Esta cuenta ({session.user.email}) no tiene permiso de administrador.</p>
+        <button type="button" className="lxp-btn" onClick={store.signOut}>Salir</button>
       </>
     )
   } else body = <Panel />
 
-  return <main className="ad"><div className="ad-in">{body}</div></main>
+  return <main className="lxp"><div className="lxp-in">{body}</div></main>
 }
 
 function Login() {
@@ -64,12 +64,12 @@ function Login() {
   }
 
   return (
-    <form className="ad-login" onSubmit={submit}>
+    <form className="lxp-login" onSubmit={submit}>
       <h1>Panel de administración</h1>
       <label>Correo<input type="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" /></label>
       <label>Contraseña<input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" /></label>
-      {error && <p className="ad-error" role="alert">{error}</p>}
-      <button className="ad-btn ad-btn--solid" disabled={busy}>{busy ? 'Entrando…' : 'Entrar'}</button>
+      {error && <p className="lxp-error" role="alert">{error}</p>}
+      <button className="lxp-btn lxp-btn--solid" disabled={busy}>{busy ? 'Entrando…' : 'Entrar'}</button>
     </form>
   )
 }
@@ -214,11 +214,11 @@ function Panel() {
 
   return (
     <>
-      <header className="ad-top">
+      <header className="lxp-top">
         <h1>Panel de administración</h1>
         <div>
-          <Link to="/" className="ad-link">Ver la tienda</Link>
-          {!store.isLocal && <button type="button" className="ad-link" onClick={store.signOut}>Salir</button>}
+          <Link to="/" className="lxp-link">Ver la tienda</Link>
+          {!store.isLocal && <button type="button" className="lxp-link" onClick={store.signOut}>Salir</button>}
         </div>
       </header>
 
@@ -229,14 +229,14 @@ function Panel() {
       {!editing && (
         <>
           {store.isLocal && (
-            <p className="ad-note">
+            <p className="lxp-note">
               <b>Modo de prueba.</b> Todavía no hay una base de datos conectada: lo que crees aquí solo se guarda en este navegador y no lo verán tus clientes.{' '}
-              <button type="button" className="ad-link" onClick={clearTestData}>Borrar los datos de prueba</button>
+              <button type="button" className="lxp-link" onClick={clearTestData}>Borrar los datos de prueba</button>
             </p>
           )}
-          {msg && <p className="ad-ok" role="status">{msg}</p>}
+          {msg && <p className="lxp-ok" role="status">{msg}</p>}
 
-          <nav className="ad-tabs">
+          <nav className="lxp-tabs">
             <button type="button" className={tab === 'perfumes' ? 'on' : ''} onClick={() => { setTab('perfumes'); setMsg('') }}>Perfumes ({data.products.length})</button>
             <button type="button" className={tab === 'categorias' ? 'on' : ''} onClick={() => { setTab('categorias'); setMsg('') }}>Categorías ({data.categories.length})</button>
             <button type="button" className={tab === 'mayoristas' ? 'on' : ''} onClick={() => { setTab('mayoristas'); setMsg('') }}>Mayoristas ({data.products.filter((p) => p.wholesale).length})</button>
@@ -247,17 +247,17 @@ function Panel() {
 
           {!loading && tab === 'perfumes' && (
             <>
-              <button type="button" className="ad-btn ad-btn--solid ad-btn--big" onClick={() => newProduct(filter)}>+ Nuevo perfume</button>
-              <div className="ad-note">
+              <button type="button" className="lxp-btn lxp-btn--solid lxp-btn--big" onClick={() => newProduct(filter)}>+ Nuevo perfume</button>
+              <div className="lxp-note">
                 <b>Subir muchos perfumes de una vez.</b> Descarga la plantilla, llénala en Excel (en la columna “categoria” pon por ejemplo Original, Árabe, Mujer…), guárdala como CSV y súbela aquí. Si la categoría no existe se crea sola.{' '}
-                <button type="button" className="ad-link" onClick={downloadTemplate}>Descargar plantilla</button>{' · '}
-                <label className="ad-link" style={{ cursor: 'pointer' }}>
+                <button type="button" className="lxp-link" onClick={downloadTemplate}>Descargar plantilla</button>{' · '}
+                <label className="lxp-link" style={{ cursor: 'pointer' }}>
                   {importing ? 'Subiendo…' : 'Subir archivo'}
                   <input type="file" accept=".csv,text/csv" hidden disabled={importing} onChange={importFile} />
                 </label>
               </div>
               {data.categories.length > 1 && (
-                <label className="ad-filter">Categoría
+                <label className="lxp-filter">Categoría
                   <select value={filter} onChange={(e) => setFilter(e.target.value)}>
                     <option value="">Todas</option>
                     {cats.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -265,46 +265,46 @@ function Panel() {
                 </label>
               )}
               {data.products.length === 0 ? (
-                <div className="ad-empty">
+                <div className="lxp-empty">
                   {store.isLocal ? (
                     <>
                       <p>Todavía no hay perfumes en el panel. La tienda está mostrando los perfumes de ejemplo.</p>
-                      <p className="ad-help">Empieza de cero con “Nuevo perfume”, o carga los {EXAMPLE_PRODUCTS.length} perfumes actuales para editarlos desde aquí.</p>
-                      <button type="button" className="ad-btn" onClick={importExamples} disabled={importing}>{importing ? 'Cargando…' : 'Cargar los perfumes actuales'}</button>
+                      <p className="lxp-help">Empieza de cero con “Nuevo perfume”, o carga los {EXAMPLE_PRODUCTS.length} perfumes actuales para editarlos desde aquí.</p>
+                      <button type="button" className="lxp-btn" onClick={importExamples} disabled={importing}>{importing ? 'Cargando…' : 'Cargar los perfumes actuales'}</button>
                     </>
                   ) : (
                     <>
                       <p>Todavía no hay perfumes. La tienda sale vacía hasta que subas el primero.</p>
-                      <p className="ad-help">Usa “Nuevo perfume” o sube la plantilla en el recuadro de arriba.</p>
+                      <p className="lxp-help">Usa “Nuevo perfume” o sube la plantilla en el recuadro de arriba.</p>
                     </>
                   )}
                 </div>
               ) : (
-                <ul className="ad-list">
+                <ul className="lxp-list">
                   {shown.map((p) => (
                     <li key={p.id} className={p.active ? '' : 'off'}>
                       <Thumb src={p.image_url} />
-                      <span className="ad-list__info">
+                      <span className="lxp-list__info">
                         <strong>{p.name}</strong>
                         <small>{catName(p.category_id)} · {money(Number(p.price) || 0)}</small>
                         <small>
-                          <span className={`ad-badge ${p.wholesale ? 'ad-badge--ok' : ''}`}>{p.wholesale ? 'Al por mayor' : 'Solo detal'}</span>
-                          {!p.active && <span className="ad-badge ad-badge--out">Oculto</span>}
-                          {p.discount_percent > 0 && <span className="ad-badge">-{p.discount_percent}%</span>}
+                          <span className={`lxp-badge ${p.wholesale ? 'lxp-badge--ok' : ''}`}>{p.wholesale ? 'Al por mayor' : 'Solo detal'}</span>
+                          {!p.active && <span className="lxp-badge lxp-badge--out">Oculto</span>}
+                          {p.discount_percent > 0 && <span className="lxp-badge">-{p.discount_percent}%</span>}
                         </small>
-                        <small className="ad-stock">
+                        <small className="lxp-stock">
                           Cantidad:
                           <button type="button" aria-label="Quitar una unidad" onClick={() => setStock(p, (Number(p.stock) || 0) - 1)} disabled={(Number(p.stock) || 0) <= 0}>−</button>
                           <b>{Number(p.stock) || 0}</b>
                           <button type="button" aria-label="Agregar una unidad" onClick={() => setStock(p, (Number(p.stock) || 0) + 1)}>+</button>
-                          {(Number(p.stock) || 0) <= 0 && <span className="ad-badge ad-badge--out">Agotado</span>}
+                          {(Number(p.stock) || 0) <= 0 && <span className="lxp-badge lxp-badge--out">Agotado</span>}
                         </small>
                       </span>
                       <button type="button" onClick={() => editProduct(p)}>Editar</button>
                       <button type="button" onClick={() => removeProduct(p)}>Borrar</button>
                     </li>
                   ))}
-                  {shown.length === 0 && <li className="ad-empty">Esta categoría todavía no tiene perfumes.</li>}
+                  {shown.length === 0 && <li className="lxp-empty">Esta categoría todavía no tiene perfumes.</li>}
                 </ul>
               )}
             </>
@@ -312,21 +312,21 @@ function Panel() {
 
           {!loading && tab === 'categorias' && (
             <>
-              <button type="button" className="ad-btn ad-btn--solid ad-btn--big" onClick={() => setEditing({ kind: 'category', data: { name: '', sort: data.categories.length, active: true, photo: '' } })}>+ Nueva categoría</button>
-              <ul className="ad-list ad-list--cats">
+              <button type="button" className="lxp-btn lxp-btn--solid lxp-btn--big" onClick={() => setEditing({ kind: 'category', data: { name: '', sort: data.categories.length, active: true, photo: '' } })}>+ Nueva categoría</button>
+              <ul className="lxp-list lxp-list--cats">
                 {cats.map((c) => (
                   <li key={c.id} className={c.active ? '' : 'off'}>
                     <Thumb src={c.photo_url} />
-                    <span className="ad-list__info">
+                    <span className="lxp-list__info">
                       <strong>{c.name}</strong>
                       <small>{countOf(c.id)} {countOf(c.id) === 1 ? 'perfume' : 'perfumes'}{c.active ? '' : ' · oculta'}</small>
                     </span>
-                    <button type="button" className="ad-btn--solid" onClick={() => { newProduct(c.id); setTab('perfumes') }}>+ Crear producto</button>
+                    <button type="button" className="lxp-btn--solid" onClick={() => { newProduct(c.id); setTab('perfumes') }}>+ Crear producto</button>
                     <button type="button" onClick={() => setEditing({ kind: 'category', data: { id: c.id, name: c.name, sort: c.sort, active: c.active, photo: c.photo_url ?? '' } })}>Editar</button>
                     <button type="button" onClick={() => removeCategory(c)}>Borrar</button>
                   </li>
                 ))}
-                {cats.length === 0 && <li className="ad-empty">Todavía no hay categorías. Crea la primera con “Nueva categoría”.</li>}
+                {cats.length === 0 && <li className="lxp-empty">Todavía no hay categorías. Crea la primera con “Nueva categoría”.</li>}
               </ul>
             </>
           )}
@@ -343,15 +343,15 @@ function Panel() {
 
           {!loading && tab === 'mayoristas' && (
             <>
-              <p className="ad-help">
+              <p className="lxp-help">
                 Aquí decides, para cada perfume, si se vende al por mayor y el descuento de cada escalón: desde {STORE.wholesaleTiers[0]}, desde {STORE.wholesaleTiers[1]} y desde {STORE.wholesaleTiers[2]} unidades
                 de ese mismo perfume. Se aplica solo en la página de Mayoristas; en la tienda normal el precio no cambia.
                 Si dejas el primero vacío, se usa el general ({Math.round(STORE.wholesaleDiscount * 100)}%); un escalón vacío repite el anterior.
               </p>
               {data.products.length > 0 && <WholesaleBulk onApply={applyWholesaleToAll} />}
-              <ul className="ad-list ad-list--ws">
+              <ul className="lxp-list lxp-list--ws">
                 {prods.map((p) => <WholesaleRow key={`${p.id}-${p.wholesale}-${p.wholesale_discount ?? ''}-${p.wholesale_discount_12 ?? ''}-${p.wholesale_discount_30 ?? ''}`} p={p} onSave={(patch) => saveWholesale(p, patch)} />)}
-                {prods.length === 0 && <li className="ad-empty">Todavía no hay perfumes. Crea el primero en la pestaña Perfumes.</li>}
+                {prods.length === 0 && <li className="lxp-empty">Todavía no hay perfumes. Crea el primero en la pestaña Perfumes.</li>}
               </ul>
             </>
           )}
@@ -365,7 +365,7 @@ function Panel() {
 function Thumb({ src }) {
   const [failed, setFailed] = useState(false)
   useEffect(() => setFailed(false), [src])
-  return src && !failed ? <img src={asset(src)} alt="" onError={() => setFailed(true)} /> : <span className="ad-thumb-empty">{src ? 'No carga' : 'Sin foto'}</span>
+  return src && !failed ? <img src={asset(src)} alt="" onError={() => setFailed(true)} /> : <span className="lxp-thumb-empty">{src ? 'No carga' : 'Sin foto'}</span>
 }
 
 // Fotos: la primera es la portada. Con `single` solo se puede tener una (se reemplaza al subir otra).
@@ -408,14 +408,14 @@ function PhotoList({ photos, onChange, single = false, addLabel = '+ Foto', main
   return (
     <>
       {cutout && (
-        <label className="ad-check"><input type="checkbox" checked={noBg} onChange={(e) => setNoBg(e.target.checked)} /> Quitar el fondo de la foto al subirla (para que salga limpia en la portada)</label>
+        <label className="lxp-check"><input type="checkbox" checked={noBg} onChange={(e) => setNoBg(e.target.checked)} /> Quitar el fondo de la foto al subirla (para que salga limpia en la portada)</label>
       )}
-      <div className="ad-photos">
+      <div className="lxp-photos">
         {photos.map((src, i) => (
-          <div className="ad-photo" key={src + i}>
+          <div className="lxp-photo" key={src + i}>
             <img src={asset(src)} alt="" />
-            {main && i === 0 && <span className="ad-photo__main">Portada</span>}
-            <div className="ad-photo__bar">
+            {main && i === 0 && <span className="lxp-photo__main">Portada</span>}
+            <div className="lxp-photo__bar">
               {!single && <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Mover a la izquierda">◀</button>}
               {!single && <button type="button" onClick={() => move(i, 1)} disabled={i === photos.length - 1} aria-label="Mover a la derecha">▶</button>}
               <button type="button" onClick={() => onChange(photos.filter((_, j) => j !== i))}>Quitar</button>
@@ -423,13 +423,13 @@ function PhotoList({ photos, onChange, single = false, addLabel = '+ Foto', main
           </div>
         ))}
         {(!single || photos.length === 0) && (
-          <label className="ad-photo ad-photo--add">
+          <label className="lxp-photo lxp-photo--add">
             {busy ? 'Subiendo…' : addLabel}
             <input type="file" accept="image/*" multiple={!single} hidden onChange={add} disabled={busy} />
           </label>
         )}
       </div>
-      {error && <p className="ad-error" role="alert">{error}</p>}
+      {error && <p className="lxp-error" role="alert">{error}</p>}
     </>
   )
 }
@@ -470,56 +470,56 @@ function OffersTab({ data, onSettings, onNew, onEdit, onDelete }) {
 
   return (
     <>
-      <h2 className="ad-h2">Oferta relámpago</h2>
-      <p className="ad-help">Muestra los perfumes que tengan “Descuento %” puesto. Aparece en el menú, en el inicio y en su página mientras esté activa, y cuando llega la hora de fin se quita sola.</p>
-      <div className="ad-box">
-        <label className="ad-check ad-check--card">
+      <h2 className="lxp-h2">Oferta relámpago</h2>
+      <p className="lxp-help">Muestra los perfumes que tengan “Descuento %” puesto. Aparece en el menú, en el inicio y en su página mientras esté activa, y cuando llega la hora de fin se quita sola.</p>
+      <div className="lxp-box">
+        <label className="lxp-check lxp-check--card">
           <input type="checkbox" checked={active} onChange={(e) => onSettings({ flash_active: e.target.checked })} />
-          <span><b>Mostrar la oferta relámpago en la tienda</b><small className="ad-help">{status}</small></span>
+          <span><b>Mostrar la oferta relámpago en la tienda</b><small className="lxp-help">{status}</small></span>
         </label>
-        <div className="ad-row">
+        <div className="lxp-row">
           <label>Termina el día y la hora
             <input type="datetime-local" value={ends} onChange={(e) => setEnds(e.target.value)} />
           </label>
-          <button type="button" className="ad-btn ad-btn--solid" disabled={!ends} onClick={() => setEnd(new Date(ends))}>Guardar hora</button>
+          <button type="button" className="lxp-btn lxp-btn--solid" disabled={!ends} onClick={() => setEnd(new Date(ends))}>Guardar hora</button>
         </div>
-        <div className="ad-quick">
+        <div className="lxp-quick">
           <span>Atajos:</span>
-          <button type="button" className="ad-btn" onClick={() => setEnd(todayEnd())}>Hasta hoy 11:59 pm</button>
-          <button type="button" className="ad-btn" onClick={() => setEnd(inHours(6))}>6 horas</button>
-          <button type="button" className="ad-btn" onClick={() => setEnd(inHours(24))}>24 horas</button>
-          <button type="button" className="ad-btn" onClick={() => setEnd(inHours(72))}>3 días</button>
-          <button type="button" className="ad-btn" onClick={() => setEnd(null)}>Sin hora (cada día a las 11:59 pm)</button>
-          <button type="button" className="ad-btn" onClick={() => onSettings({ flash_active: false })}>Quitar ahora</button>
+          <button type="button" className="lxp-btn" onClick={() => setEnd(todayEnd())}>Hasta hoy 11:59 pm</button>
+          <button type="button" className="lxp-btn" onClick={() => setEnd(inHours(6))}>6 horas</button>
+          <button type="button" className="lxp-btn" onClick={() => setEnd(inHours(24))}>24 horas</button>
+          <button type="button" className="lxp-btn" onClick={() => setEnd(inHours(72))}>3 días</button>
+          <button type="button" className="lxp-btn" onClick={() => setEnd(null)}>Sin hora (cada día a las 11:59 pm)</button>
+          <button type="button" className="lxp-btn" onClick={() => onSettings({ flash_active: false })}>Quitar ahora</button>
         </div>
       </div>
 
-      <h2 className="ad-h2">Opciones fijas del menú</h2>
-      <p className="ad-help">Son las tres opciones de ofertas del menú “Colección”. Aquí cambias la foto que sale al pasar el mouse. Si no subes una, usan la de Louryx.</p>
-      <ul className="ad-list ad-list--cats">
+      <h2 className="lxp-h2">Opciones fijas del menú</h2>
+      <p className="lxp-help">Son las tres opciones de ofertas del menú “Colección”. Aquí cambias la foto que sale al pasar el mouse. Si no subes una, usan la de Louryx.</p>
+      <ul className="lxp-list lxp-list--cats">
         {[['combo', 'Combos emprendedores', '/combos'], ['flash', 'Oferta relámpago', '/oferta-relampago'], ['kit', 'Kits', '/kits']].map(([key, title, to]) => (
           <li key={key}>
             <Thumb src={covers[key]} />
-            <span className="ad-list__info"><strong>{title}</strong><small>{to}</small></span>
+            <span className="lxp-list__info"><strong>{title}</strong><small>{to}</small></span>
             <PhotoList photos={covers[key] ? [covers[key]] : []} single addLabel="+ Foto" onChange={(a) => onSettings({ covers: { ...covers, [key]: a[0] || '' } })} />
           </li>
         ))}
       </ul>
 
-      <h2 className="ad-h2">Combos y kits</h2>
-      <p className="ad-help">
+      <h2 className="lxp-h2">Combos y kits</h2>
+      <p className="lxp-help">
         Cada combo o kit junta varios perfumes con un descuento extra. El precio se calcula solo con los precios de los perfumes.
         {data.bundles.length === 0 && ' Todavía no has creado ninguno: la tienda muestra unos de ejemplo hasta que crees el primero.'}
       </p>
-      <div className="ad-quick">
-        <button type="button" className="ad-btn ad-btn--solid" onClick={() => onNew('combo')}>+ Nuevo combo</button>
-        <button type="button" className="ad-btn ad-btn--solid" onClick={() => onNew('kit')}>+ Nuevo kit</button>
+      <div className="lxp-quick">
+        <button type="button" className="lxp-btn lxp-btn--solid" onClick={() => onNew('combo')}>+ Nuevo combo</button>
+        <button type="button" className="lxp-btn lxp-btn--solid" onClick={() => onNew('kit')}>+ Nuevo kit</button>
       </div>
-      <ul className="ad-list">
+      <ul className="lxp-list">
         {data.bundles.map((b) => (
           <li key={b.id} className={b.active === false ? 'off' : ''}>
-            <span className="ad-thumb-empty">{b.type === 'kit' ? 'Kit' : 'Combo'}</span>
-            <span className="ad-list__info">
+            <span className="lxp-thumb-empty">{b.type === 'kit' ? 'Kit' : 'Combo'}</span>
+            <span className="lxp-list__info">
               <strong>{b.name}</strong>
               <small>{(b.items || []).map((i) => `${i.qty} × ${nameOf(i.id)}`).join(' · ') || 'Sin perfumes'}</small>
               <small>{money(priceOf(b))}{b.discount_percent > 0 ? ` · ${b.discount_percent}% menos` : ''}{b.active === false ? ' · oculto' : ''}</small>
@@ -564,9 +564,9 @@ function BundleForm({ initial, products, onSaved, onCancel }) {
   }
 
   return (
-    <form className="ad-form" onSubmit={submit}>
+    <form className="lxp-form" onSubmit={submit}>
       <h2>{f.id ? 'Editar' : 'Nuevo'} {kind === 'kit' ? 'kit' : 'combo'}</h2>
-      <div className="ad-row">
+      <div className="lxp-row">
         <label>Tipo
           <select {...bind('type')}><option value="combo">Combo emprendedor</option><option value="kit">Kit</option></select>
         </label>
@@ -575,9 +575,9 @@ function BundleForm({ initial, products, onSaved, onCancel }) {
       <label>Descripción corta<textarea rows="2" {...bind('blurb')} /></label>
 
       <h3>Perfumes que incluye</h3>
-      {products.length === 0 && <p className="ad-help">Primero crea perfumes en la pestaña Perfumes.</p>}
+      {products.length === 0 && <p className="lxp-help">Primero crea perfumes en la pestaña Perfumes.</p>}
       {f.items.map((it, i) => (
-        <div className="ad-row ad-items" key={i}>
+        <div className="lxp-row lxp-items" key={i}>
           <label>Perfume
             <select value={it.id} onChange={(e) => setItem(i, { id: e.target.value })}>
               <option value="">Elige un perfume</option>
@@ -585,18 +585,18 @@ function BundleForm({ initial, products, onSaved, onCancel }) {
             </select>
           </label>
           <label>Cantidad<input type="number" min="1" step="1" inputMode="numeric" value={it.qty} onChange={(e) => setItem(i, { qty: e.target.value })} /></label>
-          <button type="button" className="ad-btn" onClick={() => set({ items: f.items.filter((_, k) => k !== i) })}>Quitar</button>
+          <button type="button" className="lxp-btn" onClick={() => set({ items: f.items.filter((_, k) => k !== i) })}>Quitar</button>
         </div>
       ))}
-      <button type="button" className="ad-btn" onClick={() => set({ items: [...f.items, { id: '', qty: 1 }] })}>+ Agregar perfume</button>
+      <button type="button" className="lxp-btn" onClick={() => set({ items: [...f.items, { id: '', qty: 1 }] })}>+ Agregar perfume</button>
 
-      <div className="ad-row">
+      <div className="lxp-row">
         <label>Descuento (%)<input type="number" min="0" max="90" step="1" inputMode="numeric" {...bind('off')} />
-          <small className="ad-help">{full > 0 ? `Suman ${money(full)} y quedan en ${money(price)}.` : 'Elige los perfumes para ver el precio.'}</small>
+          <small className="lxp-help">{full > 0 ? `Suman ${money(full)} y quedan en ${money(price)}.` : 'Elige los perfumes para ver el precio.'}</small>
         </label>
-        <label className="ad-check"><input type="checkbox" checked={f.active} onChange={(e) => set({ active: e.target.checked })} /> Visible en la tienda</label>
+        <label className="lxp-check"><input type="checkbox" checked={f.active} onChange={(e) => set({ active: e.target.checked })} /> Visible en la tienda</label>
       </div>
-      {error && <p className="ad-error" role="alert">{error}</p>}
+      {error && <p className="lxp-error" role="alert">{error}</p>}
       <Actions busy={busy} onCancel={onCancel} />
     </form>
   )
@@ -614,9 +614,9 @@ function useForm(initial) {
 
 function Actions({ busy, onCancel }) {
   return (
-    <div className="ad-actions">
-      <button className="ad-btn ad-btn--solid" disabled={busy}>{busy ? 'Guardando…' : 'Guardar'}</button>
-      <button type="button" className="ad-btn" onClick={onCancel}>Cancelar</button>
+    <div className="lxp-actions">
+      <button className="lxp-btn lxp-btn--solid" disabled={busy}>{busy ? 'Guardando…' : 'Guardar'}</button>
+      <button type="button" className="lxp-btn" onClick={onCancel}>Cancelar</button>
     </div>
   )
 }
@@ -648,13 +648,13 @@ function ProductForm({ initial, cats, onSaved, onCancel }) {
   }
 
   return (
-    <form className="ad-form" onSubmit={submit}>
+    <form className="lxp-form" onSubmit={submit}>
       <h2>{f.id ? 'Editar perfume' : 'Nuevo perfume'}</h2>
       <label>Nombre<input required autoFocus {...bind('name')} /></label>
       <label>Descripción<textarea rows="4" {...bind('description')} /></label>
-      <div className="ad-row">
+      <div className="lxp-row">
         <label>Precio (pesos)<input required type="number" min="0" step="1000" inputMode="numeric" {...bind('price')} />
-          {price > 0 && <small className="ad-help">Se verá como {money(price)}</small>}
+          {price > 0 && <small className="lxp-help">Se verá como {money(price)}</small>}
         </label>
         <label>Categoría
           <select {...bind('category_id')}>
@@ -664,7 +664,7 @@ function ProductForm({ initial, cats, onSaved, onCancel }) {
         </label>
         <label>Etiqueta (Nuevo, Edición limitada…)<input {...bind('badge')} /></label>
       </div>
-      <div className="ad-row">
+      <div className="lxp-row">
         <label>Aroma
           <select {...bind('family')}>
             <option value="">Sin aroma</option>
@@ -673,12 +673,12 @@ function ProductForm({ initial, cats, onSaved, onCancel }) {
         </label>
         <label>Tamaño (ml)<input type="number" min="1" {...bind('size_ml')} /></label>
       </div>
-      <div className="ad-row">
+      <div className="lxp-row">
         <label>Cantidad disponible<input required type="number" min="0" step="1" inputMode="numeric" {...bind('stock')} />
-          <small className="ad-help">{Number(f.stock) > 0 ? 'Se puede comprar hasta esta cantidad.' : 'Con 0 sale como Agotado y no se puede comprar.'}</small>
+          <small className="lxp-help">{Number(f.stock) > 0 ? 'Se puede comprar hasta esta cantidad.' : 'Con 0 sale como Agotado y no se puede comprar.'}</small>
         </label>
         <label>Descuento (%) — opcional<input type="number" min="1" max="90" step="1" inputMode="numeric" placeholder="Sin descuento" {...bind('discount')} />
-          <small className="ad-help">
+          <small className="lxp-help">
             {price > 0 && Number(f.discount) > 0
               ? `Pasa de ${money(price)} a ${money(Math.round((price * (1 - Math.min(90, Number(f.discount)) / 100)) / 100) * 100)}.`
               : 'Déjalo vacío si no tiene descuento.'}
@@ -686,32 +686,32 @@ function ProductForm({ initial, cats, onSaved, onCancel }) {
         </label>
       </div>
 
-      <label className="ad-check ad-check--card">
+      <label className="lxp-check lxp-check--card">
         <input type="checkbox" checked={f.wholesale} onChange={(e) => set({ wholesale: e.target.checked })} />
         <span>
           <b>Se puede vender al por mayor</b>
-          <small className="ad-help">
+          <small className="lxp-help">
             {f.wholesale
               ? `Aparece en la página de Mayoristas desde ${STORE.wholesaleFrom} unidades. Su descuento mayorista se pone en la pestaña Mayoristas.`
               : 'No aparece en Mayoristas: solo se vende al detal.'}
           </small>
         </span>
       </label>
-      <div className="ad-checks">
-        <label className="ad-check"><input type="checkbox" checked={f.active} onChange={(e) => set({ active: e.target.checked })} /> Visible en la tienda</label>
-        <label className="ad-check"><input type="checkbox" checked={f.featured} onChange={(e) => set({ featured: e.target.checked })} /> Más vendido</label>
-        <label className="ad-check"><input type="checkbox" checked={f.is_new} onChange={(e) => set({ is_new: e.target.checked })} /> Nuevo ingreso (sale en la portada de inicio)</label>
+      <div className="lxp-checks">
+        <label className="lxp-check"><input type="checkbox" checked={f.active} onChange={(e) => set({ active: e.target.checked })} /> Visible en la tienda</label>
+        <label className="lxp-check"><input type="checkbox" checked={f.featured} onChange={(e) => set({ featured: e.target.checked })} /> Más vendido</label>
+        <label className="lxp-check"><input type="checkbox" checked={f.is_new} onChange={(e) => set({ is_new: e.target.checked })} /> Nuevo ingreso (sale en la portada de inicio)</label>
       </div>
 
       <h3>Portada</h3>
-      <p className="ad-help">Es la foto principal del perfume: sale en el inicio, en el carrusel, en las tarjetas y como foto grande en su página. Mejor con fondo transparente o liso. Si subes otra, reemplaza a la anterior.</p>
+      <p className="lxp-help">Es la foto principal del perfume: sale en el inicio, en el carrusel, en las tarjetas y como foto grande en su página. Mejor con fondo transparente o liso. Si subes otra, reemplaza a la anterior.</p>
       <PhotoList photos={f.cover ? [f.cover] : []} single addLabel="+ Portada" main cutout onChange={(a) => set({ cover: a[0] || '' })} />
 
       <h3>Fotos secundarias</h3>
-      <p className="ad-help">Otros ángulos o detalles (caja, tamaño, en mano…). En la página del perfume salen como miniaturas debajo de la foto grande.</p>
+      <p className="lxp-help">Otros ángulos o detalles (caja, tamaño, en mano…). En la página del perfume salen como miniaturas debajo de la foto grande.</p>
       <PhotoList photos={f.extra} addLabel="+ Foto" onChange={(a) => set({ extra: a })} />
 
-      {error && <p className="ad-error" role="alert">{error}</p>}
+      {error && <p className="lxp-error" role="alert">{error}</p>}
       <Actions busy={busy} onCancel={onCancel} />
     </form>
   )
@@ -736,17 +736,17 @@ function CategoryForm({ initial, onSaved, onCancel }) {
   }
 
   return (
-    <form className="ad-form" onSubmit={submit}>
+    <form className="lxp-form" onSubmit={submit}>
       <h2>{f.id ? 'Editar categoría' : 'Nueva categoría'}</h2>
       <label>Nombre<input required autoFocus {...bind('name')} /></label>
-      <div className="ad-row">
+      <div className="lxp-row">
         <label>Orden (menor sale primero)<input type="number" {...bind('sort')} /></label>
-        <label className="ad-check"><input type="checkbox" checked={f.active} onChange={(e) => set({ active: e.target.checked })} /> Visible en la tienda</label>
+        <label className="lxp-check"><input type="checkbox" checked={f.active} onChange={(e) => set({ active: e.target.checked })} /> Visible en la tienda</label>
       </div>
       <h3>Portada de la categoría</h3>
-      <p className="ad-help">Es la foto que sale en el menú “Colección” y en las colecciones del inicio. Mejor vertical (4:5). Si subes otra, reemplaza a la anterior.</p>
+      <p className="lxp-help">Es la foto que sale en el menú “Colección” y en las colecciones del inicio. Mejor vertical (4:5). Si subes otra, reemplaza a la anterior.</p>
       <PhotoList photos={f.photo ? [f.photo] : []} single addLabel="+ Foto" onChange={(a) => set({ photo: a[0] || '' })} />
-      {error && <p className="ad-error" role="alert">{error}</p>}
+      {error && <p className="lxp-error" role="alert">{error}</p>}
       <Actions busy={busy} onCancel={onCancel} />
     </form>
   )
@@ -759,13 +759,13 @@ const toPct = (v) => (Number(v) > 0 ? Math.min(90, Math.max(1, Math.round(Number
 function WholesaleBulk({ onApply }) {
   const [v, setV] = useState(['', '', ''])
   return (
-    <div className="ad-bulk">
+    <div className="lxp-bulk">
       {STORE.wholesaleTiers.map((t, i) => (
         <label key={t}>Desde {t} u. (%)
           <input type="number" min="1" max="90" step="1" inputMode="numeric" value={v[i]} placeholder={i === 0 ? `Ej. ${Math.round(STORE.wholesaleDiscount * 100)}` : 'Vacío'} onChange={(e) => setV(v.map((x, k) => (k === i ? e.target.value : x)))} />
         </label>
       ))}
-      <button type="button" className="ad-btn" onClick={() => onApply(Object.fromEntries(KEYS.map((k, i) => [k, toPct(v[i])])))}>Aplicar a todos</button>
+      <button type="button" className="lxp-btn" onClick={() => onApply(Object.fromEntries(KEYS.map((k, i) => [k, toPct(v[i])])))}>Aplicar a todos</button>
     </div>
   )
 }
@@ -787,16 +787,16 @@ function WholesaleRow({ p, onSave }) {
   return (
     <li className={p.wholesale ? '' : 'off'}>
       <Thumb src={p.image_url} />
-      <span className="ad-list__info">
+      <span className="lxp-list__info">
         <strong>{p.name}</strong>
         <small>Precio normal {money(price)}</small>
         {p.wholesale && <small>{STORE.wholesaleTiers.map((t, i) => `Desde ${t}: ${money(wholesalePrice(price, shown[i]))}`).join(' · ')} c/u</small>}
       </span>
-      <label className="ad-check ad-ws-on">
+      <label className="lxp-check lxp-ws-on">
         <input type="checkbox" checked={Boolean(p.wholesale)} onChange={(e) => onSave({ wholesale: e.target.checked })} /> Al por mayor
       </label>
       {STORE.wholesaleTiers.map((t, i) => (
-        <label key={t} className="ad-ws-pct">Desde {t} u. (%)
+        <label key={t} className="lxp-ws-pct">Desde {t} u. (%)
           <input
             type="number" min="1" max="90" step="1" inputMode="numeric" value={v[i]} placeholder={i === 0 ? `General ${general}` : 'Igual al anterior'} disabled={!p.wholesale}
             onChange={(e) => setV(v.map((x, k) => (k === i ? e.target.value : x)))} onBlur={() => commit(i)} onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
