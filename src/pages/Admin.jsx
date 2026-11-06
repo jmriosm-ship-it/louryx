@@ -190,20 +190,38 @@ function Panel() {
       if (!window.confirm(`Se van a subir ${good.length} perfumes (los que ya existan con el mismo nombre se actualizan; las categorías que falten se crean).${errors.length ? ` ${errors.length} filas tienen errores y se saltan.` : ''} ¿Continuar?`)) return
       const catIds = Object.fromEntries(data.categories.map((c) => [c.name.trim().toLowerCase(), c.id]))
       const byName = Object.fromEntries(data.products.map((p) => [p.name.trim().toLowerCase(), p]))
-      let created = 0, updated = 0, newCats = 0
-      for (const { category, row } of good) {
-        const key = category.trim().toLowerCase()
-        if (key && !catIds[key]) {
-          catIds[key] = (await store.saveCategory({ name: category.trim(), sort: Object.keys(catIds).length, active: true })).id
-          newCats++
+      let created = 0, updated = 0, newCats = 0, skipped = 0
+      const failed = []
+      // Cada guardado espera máximo 25 s y se reintenta 2 veces, para que una conexión lenta no deje la carga colgada
+      const tryTwice = async (fn) => {
+        for (let t = 0; ; t++) {
+          try {
+            return await Promise.race([fn(), new Promise((_, no) => setTimeout(() => no(new Error('tardó demasiado')), 25000))])
+          } catch (err) {
+            if (t >= 2) throw err
+          }
         }
-        const old = byName[row.name.trim().toLowerCase()]
-        if (old) { for (const k of Object.keys(row)) if (row[k] === undefined || row[k] === null || row[k] === '') delete row[k] }
-        const saved = await store.saveProduct({ ...(old ? { id: old.id } : { price: 0 }), ...Object.fromEntries(Object.entries(row).filter(([, v]) => v !== undefined)), category_id: key ? catIds[key] : old?.category_id ?? null })
-        byName[row.name.trim().toLowerCase()] = saved
-        old ? updated++ : created++
       }
-      await done(`Listo: ${created} perfumes nuevos, ${updated} actualizados y ${newCats} categorías nuevas.${errors.length ? ` Saltadas: ${errors.slice(0, 3).join(' · ')}` : ''}`)
+      for (const [i, { category, row }] of good.entries()) {
+        setMsg(`Subiendo perfumes… ${i + 1} de ${good.length}`)
+        try {
+          const key = category.trim().toLowerCase()
+          if (key && !catIds[key]) {
+            catIds[key] = (await tryTwice(() => store.saveCategory({ name: category.trim(), sort: Object.keys(catIds).length, active: true }))).id
+            newCats++
+          }
+          const old = byName[row.name.trim().toLowerCase()]
+          // Si ya está y en su categoría, no hay nada que cambiar (así se puede volver a subir el archivo para continuar)
+          if (old && (!key || old.category_id === catIds[key])) { skipped++; continue }
+          const fields = Object.fromEntries(Object.entries(row).filter(([, v]) => v !== undefined && !(old && (v === null || v === ''))))
+          const saved = await tryTwice(() => store.saveProduct({ ...(old ? { id: old.id } : { price: 0 }), ...fields, category_id: key ? catIds[key] : old?.category_id ?? null }))
+          byName[row.name.trim().toLowerCase()] = saved
+          old ? updated++ : created++
+        } catch (err) {
+          failed.push(`${row.name} (${err.message || 'error'})`)
+        }
+      }
+      await done(`Listo: ${created} perfumes nuevos, ${updated} actualizados${skipped ? `, ${skipped} ya estaban` : ''} y ${newCats} categorías nuevas.${failed.length ? ` No se pudieron subir ${failed.length}: ${failed.slice(0, 3).join(' · ')}` : ''}${errors.length ? ` Filas saltadas: ${errors.slice(0, 3).join(' · ')}` : ''}`)
     } catch (err) {
       setMsg(`No se pudo importar: ${err.message || 'error'}`)
     } finally {
