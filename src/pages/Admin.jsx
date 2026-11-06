@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import * as store from '../lib/catalogStore'
 import { cutoutFile } from '../lib/cutout'
+import { parseCsv, rowToProduct, templateCsv } from '../lib/csvImport'
 import { useCatalog } from '../context/CatalogContext'
 import { products as EXAMPLE_PRODUCTS, CATEGORIES as EXAMPLE_CATEGORIES, FAMILIES } from '../data/products'
 import { STORE, asset, money, wholesalePercent, wholesalePrice } from '../config'
@@ -164,6 +165,51 @@ function Panel() {
     }
   }
 
+  // Sube todos los perfumes de un archivo CSV: si el nombre ya existe lo actualiza, si no lo crea.
+  // La categoría de cada fila se busca por nombre; si no existe se crea sola.
+  const downloadTemplate = () => {
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(new Blob([templateCsv()], { type: 'text/csv;charset=utf-8' }))
+    a.download = 'plantilla-perfumes-louryx.csv'
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+  const importFile = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setImporting(true)
+    setMsg('')
+    try {
+      const rows = parseCsv(await file.text())
+      if (!rows.length) throw new Error('el archivo está vacío o no tiene el formato de la plantilla')
+      const items = rows.map((r, i) => rowToProduct(r, i + 2))
+      const errors = items.filter((x) => x.error).map((x) => x.error)
+      const good = items.filter((x) => !x.error)
+      if (!good.length) throw new Error(errors.slice(0, 3).join(' · '))
+      if (!window.confirm(`Se van a subir ${good.length} perfumes (los que ya existan con el mismo nombre se actualizan; las categorías que falten se crean).${errors.length ? ` ${errors.length} filas tienen errores y se saltan.` : ''} ¿Continuar?`)) return
+      const catIds = Object.fromEntries(data.categories.map((c) => [c.name.trim().toLowerCase(), c.id]))
+      const byName = Object.fromEntries(data.products.map((p) => [p.name.trim().toLowerCase(), p]))
+      let created = 0, updated = 0, newCats = 0
+      for (const { category, row } of good) {
+        const key = category.trim().toLowerCase()
+        if (key && !catIds[key]) {
+          catIds[key] = (await store.saveCategory({ name: category.trim(), sort: Object.keys(catIds).length, active: true })).id
+          newCats++
+        }
+        const old = byName[row.name.trim().toLowerCase()]
+        const saved = await store.saveProduct({ ...(old ? { id: old.id } : {}), ...row, category_id: key ? catIds[key] : old?.category_id ?? null })
+        byName[row.name.trim().toLowerCase()] = saved
+        old ? updated++ : created++
+      }
+      await done(`Listo: ${created} perfumes nuevos, ${updated} actualizados y ${newCats} categorías nuevas.${errors.length ? ` Saltadas: ${errors.slice(0, 3).join(' · ')}` : ''}`)
+    } catch (err) {
+      setMsg(`No se pudo importar: ${err.message || 'error'}`)
+    } finally {
+      setImporting(false)
+    }
+  }
+
   const shown = prods.filter((p) => !filter || p.category_id === filter)
 
   return (
@@ -202,6 +248,14 @@ function Panel() {
           {!loading && tab === 'perfumes' && (
             <>
               <button type="button" className="ad-btn ad-btn--solid ad-btn--big" onClick={() => newProduct(filter)}>+ Nuevo perfume</button>
+              <div className="ad-note">
+                <b>Subir muchos perfumes de una vez.</b> Descarga la plantilla, llénala en Excel (en la columna “categoria” pon por ejemplo Original, Árabe, Mujer…), guárdala como CSV y súbela aquí. Si la categoría no existe se crea sola.{' '}
+                <button type="button" className="ad-link" onClick={downloadTemplate}>Descargar plantilla</button>{' · '}
+                <label className="ad-link" style={{ cursor: 'pointer' }}>
+                  {importing ? 'Subiendo…' : 'Subir archivo'}
+                  <input type="file" accept=".csv,text/csv" hidden disabled={importing} onChange={importFile} />
+                </label>
+              </div>
               {data.categories.length > 1 && (
                 <label className="ad-filter">Categoría
                   <select value={filter} onChange={(e) => setFilter(e.target.value)}>
