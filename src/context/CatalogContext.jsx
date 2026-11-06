@@ -15,7 +15,7 @@ const bundlesOf = (raw) => (raw?.bundles?.length
   ? raw.bundles.filter((b) => b.active !== false).map((b) => ({
     id: String(b.id), type: b.type, name: b.name, blurb: b.blurb || '', off: Number(b.discount_percent) || 0, items: b.items || [],
   }))
-  : STATIC_BUNDLES)
+  : hasBackend ? [] : STATIC_BUNDLES)
 // Ajustes: oferta relámpago encendida (por defecto sí), su hora de fin (vacía = termina cada día a las 11:59 pm) y fotos del menú
 const settingsOf = (raw) => ({
   flashActive: raw?.settings?.flash_active !== false,
@@ -24,7 +24,8 @@ const settingsOf = (raw) => ({
 })
 
 function build(raw) {
-  if (!raw || !raw.products.some((p) => p.active)) {
+  // Con la base de datos conectada la tienda muestra solo lo que hay en ella (aunque esté vacía); los perfumes de ejemplo solo salen sin base de datos
+  if (!raw || (!hasBackend && !raw.products.some((p) => p.active))) {
     return { products: STATIC, categories: STATIC_CATS, categoryPhotos: {}, bundles: bundlesOf(raw), settings: settingsOf(raw), source: 'static' }
   }
   const cats = raw.categories.filter((c) => c.active)
@@ -71,7 +72,7 @@ function build(raw) {
 }
 
 export function CatalogProvider({ children }) {
-  const [state, setState] = useState(() => build(null))
+  const [state, setState] = useState(() => build(hasBackend ? { products: [], categories: [], bundles: [], settings: {} } : null))
   // Con base de datos se espera a leerla para no mostrar un instante los perfumes de ejemplo
   const [loading, setLoading] = useState(hasBackend)
 
@@ -79,7 +80,7 @@ export function CatalogProvider({ children }) {
     try {
       setState(build(await listAll()))
     } catch {
-      setState(build(null))
+      setState(build(hasBackend ? { products: [], categories: [], bundles: [], settings: {} } : null))
     } finally {
       setLoading(false)
     }

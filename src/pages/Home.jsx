@@ -93,7 +93,13 @@ export default function Home() {
           )}
           <div className="hero-slides">
             {leaving && <HeroSlide key={`out-${leaving.id}`} p={leaving} className={outClass} />}
-            <HeroSlide key={cur.id} p={cur} className={inClass} />
+            {cur ? <HeroSlide key={cur.id} p={cur} className={inClass} /> : (
+              <div className="hero-center">
+                <h1>LOURYX</h1>
+                <p className="hc-price">Muy pronto, nuevos perfumes</p>
+                <div className="hero-cta"><a className="btn" href={`https://wa.me/${STORE.whatsapp}`} target="_blank" rel="noreferrer">Escríbenos por WhatsApp</a></div>
+              </div>
+            )}
           </div>
           {n > 1 && (
             <button key={next.id} className="hero-side r" onClick={() => go(1)} aria-label={`Siguiente: ${next.name}`}>
@@ -140,6 +146,7 @@ export default function Home() {
         <Collections />
       </section>
 
+      {star && (
       <section className="section container">
         <div className="section-head">
           <div><p className="eyebrow">Selección</p><h2 className="display">Más vendidos</h2></div>
@@ -166,6 +173,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {hasCombos && (
         <section className="section container">

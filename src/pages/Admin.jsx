@@ -266,9 +266,18 @@ function Panel() {
               )}
               {data.products.length === 0 ? (
                 <div className="ad-empty">
-                  <p>Todavía no hay perfumes en el panel. La tienda está mostrando los perfumes de ejemplo.</p>
-                  <p className="ad-help">Empieza de cero con “Nuevo perfume”, o carga los {EXAMPLE_PRODUCTS.length} perfumes actuales para editarlos desde aquí.</p>
-                  <button type="button" className="ad-btn" onClick={importExamples} disabled={importing}>{importing ? 'Cargando…' : 'Cargar los perfumes actuales'}</button>
+                  {store.isLocal ? (
+                    <>
+                      <p>Todavía no hay perfumes en el panel. La tienda está mostrando los perfumes de ejemplo.</p>
+                      <p className="ad-help">Empieza de cero con “Nuevo perfume”, o carga los {EXAMPLE_PRODUCTS.length} perfumes actuales para editarlos desde aquí.</p>
+                      <button type="button" className="ad-btn" onClick={importExamples} disabled={importing}>{importing ? 'Cargando…' : 'Cargar los perfumes actuales'}</button>
+                    </>
+                  ) : (
+                    <>
+                      <p>Todavía no hay perfumes. La tienda sale vacía hasta que subas el primero.</p>
+                      <p className="ad-help">Usa “Nuevo perfume” o sube la plantilla en el recuadro de arriba.</p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <ul className="ad-list">
