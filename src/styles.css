@@ -763,3 +763,6 @@ img.ws-img { mix-blend-mode: screen; }
 /* Foto de colección que es un frasco (vertical): entera, a un lado, sobre fondo oscuro */
 .col-panel.has-img.is-bottle { background: radial-gradient(circle at 68% 42%, #2b2b2b, #0b0b0b 72%); }
 .col-panel.has-img.is-bottle::before { background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0) 45%), var(--img) 70% 38% / auto 82% no-repeat; }
+
+/* Título de "Nosotros": mismo estilo que el nombre LOURYX del logo */
+.about-title { font-family: 'Anton', Impact, sans-serif; font-weight: 400; font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 1.05; letter-spacing: 0.04em; text-transform: uppercase; margin: 8px 0 22px; text-wrap: balance; }
