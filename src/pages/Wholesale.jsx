@@ -108,7 +108,7 @@ export default function Wholesale() {
         </div>
       </div>
       <p className="lead ws-intro">
-        Compra a precio mayorista desde <strong>{min} unidades</strong>. Puedes elegir cualquier referencia de nuestro catálogo y combinar diferentes perfumes para completar tu pedido, sin necesidad de repetir una misma referencia. Al completar las {min} unidades, cada perfume tendrá su respectivo precio mayorista, según la referencia elegida. Además, si pides <strong>{STORE.wholesaleTiers.slice(1).join(' o ')} unidades o más de una misma referencia</strong>, ese perfume baja de precio otra vez.
+        Compra a precio mayorista desde <strong>{min} unidades</strong>. Puedes elegir cualquier referencia de nuestro catálogo y combinar diferentes perfumes para completar tu pedido, sin necesidad de repetir una misma referencia. Al completar las {min} unidades, cada perfume tendrá su respectivo precio mayorista, según la referencia elegida. Además, si realizas una compra de mayor volumen, podrás acceder a descuentos adicionales.
       </p>
 
       <div className="checkout ws">
