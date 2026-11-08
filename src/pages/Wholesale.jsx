@@ -29,6 +29,15 @@ export default function Wholesale() {
   const [qty, setQty] = useState(load) // { [id]: unidades }
   const [f, setF] = useState(empty)
   const [sent, setSent] = useState(false)
+  const [bagOpen, setBagOpen] = useState(false) // en el celular el pedido es un panel que sube desde abajo
+  useEffect(() => {
+    if (!bagOpen) return undefined
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const esc = (e) => e.key === 'Escape' && setBagOpen(false)
+    window.addEventListener('keydown', esc)
+    return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', esc) }
+  }, [bagOpen])
   const [cat, setCat] = useState('Todos')
 
   useEffect(() => {
@@ -117,6 +126,10 @@ export default function Wholesale() {
             {cats.map((c) => (
               <button key={c} type="button" className={`chip ${cat === c ? 'on' : ''}`} aria-pressed={cat === c} onClick={() => setCat(c)}>{c}</button>
             ))}
+            <button type="button" className={`chip ws-bag ${units ? 'has' : ''}`} onClick={() => setBagOpen(true)} aria-label={`Ver mi pedido, ${units} unidades`}>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></svg>
+              Mi pedido{units > 0 && <b>{units}</b>}
+            </button>
           </div>
           <ul className="ws-list">
             {list.map((p) => {
@@ -164,7 +177,9 @@ export default function Wholesale() {
           </ul>
         </div>
 
-        <aside className="summary">
+        {bagOpen && <div className="ws-backdrop" onClick={() => setBagOpen(false)} aria-hidden="true" />}
+        <aside className={`summary ws-sheet ${bagOpen ? 'open' : ''}`}>
+          <button type="button" className="ws-close" onClick={() => setBagOpen(false)} aria-label="Cerrar mi pedido">×</button>
           <h3>Tu pedido mayorista</h3>
           <p className="muted">
             {lines.length === 0
