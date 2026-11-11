@@ -262,6 +262,42 @@ function Panel() {
     }
   }
 
+  // Pone sola la foto a cada perfume que no tiene, tomándola de la carpeta /catalogo de la tienda (sin elegir archivos).
+  // Une cada perfume con su foto por el nombre (ej. "Orientica Royal Bleu" -> orientica-royal-bleu.webp).
+  const autoPhotos = async () => {
+    setImporting(true)
+    setMsg('')
+    try {
+      const idx = await (await fetch(asset('/catalogo/index.json'), { cache: 'no-store' })).json()
+      const slugOf = (t) => String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+      const todo = data.products.filter((p) => !p.image_url && idx[slugOf(p.name)])
+      const noPhoto = data.products.filter((p) => !p.image_url && !idx[slugOf(p.name)]).map((p) => p.name)
+      if (!todo.length) throw new Error(noPhoto.length ? `no hay fotos para ${noPhoto.length} perfumes sin foto (ej. ${noPhoto.slice(0, 3).join(', ')})` : 'todos los perfumes ya tienen foto')
+      let ok = 0
+      const failed = []
+      const catPhoto = {}
+      for (const [i, p] of todo.entries()) {
+        setMsg(`Poniendo fotos… ${i + 1} de ${todo.length}`)
+        const url = '/catalogo/' + idx[slugOf(p.name)]
+        try {
+          for (let t = 0; ; t++) {
+            try { await store.saveProduct({ id: p.id, image_url: url }); break } catch (err) { if (t >= 2) throw err }
+          }
+          ok++
+          if (p.category_id && !catPhoto[p.category_id]) catPhoto[p.category_id] = url
+        } catch (err) {
+          failed.push(p.name)
+        }
+      }
+      for (const c of data.categories) if (!c.photo_url && catPhoto[c.id]) await store.saveCategory({ id: c.id, photo_url: catPhoto[c.id] })
+      await done(`Listo: ${ok} fotos puestas.${failed.length ? ` Fallaron ${failed.length}: ${failed.slice(0, 3).join(', ')}.` : ''}${noPhoto.length ? ` Sin foto en el catálogo: ${noPhoto.length} (ej. ${noPhoto.slice(0, 3).join(', ')}).` : ''}`)
+    } catch (err) {
+      setMsg(`No se pudieron poner las fotos: ${err.message || 'error'}`)
+    } finally {
+      setImporting(false)
+    }
+  }
+
   const shown = prods.filter((p) => !filter || p.category_id === filter)
 
   return (
@@ -310,7 +346,8 @@ function Panel() {
                 <label className="ad-link" style={{ cursor: 'pointer' }}>
                   {importing ? 'Subiendo…' : 'Subir fotos (varias)'}
                   <input type="file" accept="image/*" multiple hidden disabled={importing} onChange={importPhotos} />
-                </label>
+                </label>{' · '}
+                <button type="button" className="ad-link" disabled={importing} onClick={autoPhotos}>Poner fotos del catálogo (automático)</button>
               </div>
               {data.categories.length > 1 && (
                 <label className="lxp-filter">Categoría
