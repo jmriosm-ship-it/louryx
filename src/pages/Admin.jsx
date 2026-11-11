@@ -272,7 +272,8 @@ function Panel() {
     try {
       const idx = await (await fetch(asset('/catalogo/index.json'), { cache: 'no-store' })).json()
       const slugOf = (t) => String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-      const todo = data.products.filter((p) => !p.image_url && idx[slugOf(p.name)])
+      const replaceAll = data.products.some((p) => p.image_url) && window.confirm('¿Reemplazar también las fotos que ya tienen puestas?\n\nAceptar: se reemplazan por las del catálogo (incluye las que subiste antes).\nCancelar: solo se llenan los perfumes que no tienen foto.')
+      const todo = data.products.filter((p) => idx[slugOf(p.name)] && (replaceAll ? p.image_url !== '/catalogo/' + idx[slugOf(p.name)] : !p.image_url))
       const noPhoto = data.products.filter((p) => !p.image_url && !idx[slugOf(p.name)]).map((p) => p.name)
       if (!todo.length) throw new Error(noPhoto.length ? `no hay fotos para ${noPhoto.length} perfumes sin foto (ej. ${noPhoto.slice(0, 3).join(', ')})` : 'todos los perfumes ya tienen foto')
       let ok = 0
