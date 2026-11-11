@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import * as store from '../lib/catalogStore'
 import { cutoutFile } from '../lib/cutout'
@@ -83,6 +83,8 @@ function Panel() {
   const [filter, setFilter] = useState('')
   const [msg, setMsg] = useState('')
   const [importing, setImporting] = useState(false)
+  const csvRef = useRef(null)
+  const photosRef = useRef(null)
 
   const load = async () => {
     setData(await store.listAll())
@@ -338,16 +340,14 @@ function Panel() {
               <button type="button" className="lxp-btn lxp-btn--solid lxp-btn--big" onClick={() => newProduct(filter)}>+ Nuevo perfume</button>
               <div className="lxp-note">
                 <b>Subir muchos perfumes de una vez.</b> Descarga la plantilla, llénala en Excel (en la columna “categoria” pon por ejemplo Original, Árabe, Mujer…), guárdala como CSV y súbela aquí. Si la categoría no existe se crea sola.{' '}
-                <button type="button" className="lxp-link" onClick={downloadTemplate}>Descargar plantilla</button>{' · '}
-                <label className="lxp-link" style={{ cursor: 'pointer' }}>
-                  {importing ? 'Subiendo…' : 'Subir archivo'}
-                  <input type="file" accept=".csv,text/csv" hidden disabled={importing} onChange={importFile} />
-                </label>{' · '}
-                <label className="ad-link" style={{ cursor: 'pointer' }}>
-                  {importing ? 'Subiendo…' : 'Subir fotos (varias)'}
-                  <input type="file" accept="image/*" multiple hidden disabled={importing} onChange={importPhotos} />
-                </label>{' · '}
-                <button type="button" className="ad-link" disabled={importing} onClick={autoPhotos}>Poner fotos del catálogo (automático)</button>
+                <span className="lxp-links">
+                  <button type="button" className="lxp-link" onClick={downloadTemplate}>Descargar plantilla</button>
+                  <button type="button" className="lxp-link" disabled={importing} onClick={() => csvRef.current?.click()}>{importing ? 'Subiendo…' : 'Subir archivo'}</button>
+                  <button type="button" className="lxp-link" disabled={importing} onClick={() => photosRef.current?.click()}>Subir fotos (varias)</button>
+                  <button type="button" className="lxp-link" disabled={importing} onClick={autoPhotos}>Poner fotos del catálogo (automático)</button>
+                </span>
+                <input ref={csvRef} type="file" accept=".csv,text/csv" hidden onChange={importFile} />
+                <input ref={photosRef} type="file" accept="image/*" multiple hidden onChange={importPhotos} />
               </div>
               {data.categories.length > 1 && (
                 <label className="lxp-filter">Categoría

@@ -779,3 +779,8 @@ img.ws-img { mix-blend-mode: screen; }
   .summary.ws-sheet.open { transform: none; visibility: visible; transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
 }
 @media (prefers-reduced-motion: reduce) { .summary.ws-sheet, .summary.ws-sheet.open { transition: none; } }
+
+/* Enlaces de carga del panel: uno al lado del otro, sin etiquetas sueltas */
+.lxp-links { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 8px; }
+.lxp-links .lxp-link { margin-left: 0; font-weight: 600; }
+.lxp-links .lxp-link:disabled { opacity: 0.5; cursor: default; }
