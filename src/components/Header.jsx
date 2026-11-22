@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { STORE, asset } from '../config'
+import { STORE, asset, money } from '../config'
 import { buildMenuItems } from './menuItems'
 import { useCatalog } from '../context/CatalogContext'
 
@@ -29,6 +29,25 @@ export default function Header() {
     navigate(`/catalogo?q=${encodeURIComponent(q.trim())}`)
     setMenu(false)
     setFind(false)
+  }
+
+  // Sugerencias en vivo: se filtran al escribir, sin tildes ni mayúsculas
+  const norm = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  const suggestions = useMemo(() => {
+    const words = norm(q).split(/\s+/).filter(Boolean)
+    if (!words.length) return []
+    return catalog.products
+      .filter((p) => {
+        const hay = norm([p.name, p.family, p.category].join(' '))
+        return words.every((w) => hay.includes(w))
+      })
+      .sort((a, b) => Number(norm(b.name).startsWith(words[0])) - Number(norm(a.name).startsWith(words[0])))
+      .slice(0, 6)
+  }, [q, catalog.products])
+
+  const closeSearch = () => {
+    setFind(false)
+    setQ('')
   }
 
   return (
@@ -106,7 +125,37 @@ export default function Header() {
         {find && (
           <form className="search-bar" onSubmit={search} role="search">
             <div className="container">
-              <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar perfume…" aria-label="Buscar perfume" />
+              <input
+                autoFocus
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                onKeyDown={(e) => e.key === 'Escape' && closeSearch()}
+                placeholder="Buscar perfume…"
+                aria-label="Buscar perfume"
+                autoComplete="off"
+              />
+              {q.trim() && (
+                <ul className="suggest" role="listbox" aria-label="Sugerencias">
+                  {suggestions.map((p) => (
+                    <li key={p.id} role="option">
+                      <Link to={`/perfume/${p.id}`} onClick={closeSearch}>
+                        {p.image ? <img src={asset(p.image)} alt="" loading="lazy" /> : <span className="suggest__ph" aria-hidden="true" />}
+                        <span className="suggest__txt">
+                          <b>{p.name}</b>
+                          <small>{p.category} · {p.family}</small>
+                        </span>
+                        <span className="suggest__price">{money(p.price)}</span>
+                      </Link>
+                    </li>
+                  ))}
+                  {suggestions.length === 0 && <li className="suggest__empty">No encontramos “{q.trim()}”</li>}
+                  {suggestions.length > 0 && (
+                    <li>
+                      <button type="submit" className="suggest__all">Ver todos los resultados de “{q.trim()}” →</button>
+                    </li>
+                  )}
+                </ul>
+              )}
             </div>
           </form>
         )}
