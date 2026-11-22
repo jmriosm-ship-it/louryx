@@ -723,8 +723,9 @@ img.ws-img { mix-blend-mode: screen; }
 .pay { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 10px; }
 .pay-t { margin: 0; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: #bdbdbd; }
 .pay-logos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.pay-logos li { height: 52px; display: grid; place-items: center; background: #fff; border-radius: 6px; padding: 6px 8px; }
-.pay-logos img { max-width: 100%; max-height: 38px; width: auto; height: auto; object-fit: contain; display: block; }
+/* Los PNG traen el blanco pintado: invertidos y mezclados con "screen" el blanco desaparece sobre el fondo oscuro */
+.pay-logos li { height: 52px; display: grid; place-items: center; padding: 6px 8px; isolation: isolate; }
+.pay-logos img { max-width: 100%; max-height: 38px; width: auto; height: auto; object-fit: contain; display: block; filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
 .pay-note { margin: 0; font-size: 0.8rem; color: var(--muted); line-height: 1.4; }
 
 /* Elección de transportadora */
