@@ -51,6 +51,25 @@ alter table public.louryx_products add column if not exists wholesale_discount i
 alter table public.louryx_products add column if not exists wholesale_discount_12 integer check (wholesale_discount_12 between 1 and 90);
 alter table public.louryx_products add column if not exists wholesale_discount_30 integer check (wholesale_discount_30 between 1 and 90);
 
+-- Combos y kits (los arma el administrador en la pestaña Ofertas)
+create table if not exists public.louryx_bundles (
+  id uuid primary key default gen_random_uuid(),
+  type text not null check (type in ('combo', 'kit')),
+  name text not null,
+  blurb text,
+  discount_percent integer not null default 0 check (discount_percent between 0 and 90),
+  items jsonb not null default '[]',    -- [{ "id": "<id del perfume>", "qty": 2 }]
+  sort integer not null default 0,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+-- Ajustes de la tienda: oferta relámpago (encendida, hora de fin) y fotos del menú. Una sola fila con key = 'shop'.
+create table if not exists public.louryx_settings (
+  key text primary key,
+  value jsonb not null default '{}'
+);
+
 -- Quiénes son administradores (los dueños)
 create table if not exists public.louryx_admins (
   user_id uuid primary key references auth.users(id) on delete cascade
@@ -71,6 +90,8 @@ $$;
 alter table public.louryx_categories enable row level security;
 alter table public.louryx_products enable row level security;
 alter table public.louryx_admins enable row level security;
+alter table public.louryx_bundles enable row level security;
+alter table public.louryx_settings enable row level security;
 
 drop policy if exists "ver categorias louryx" on public.louryx_categories;
 create policy "ver categorias louryx" on public.louryx_categories for select
@@ -84,6 +105,19 @@ create policy "ver productos louryx" on public.louryx_products for select
   using (active or public.louryx_is_admin());
 drop policy if exists "admin productos louryx" on public.louryx_products;
 create policy "admin productos louryx" on public.louryx_products for all to authenticated
+  using (public.louryx_is_admin()) with check (public.louryx_is_admin());
+
+drop policy if exists "ver combos louryx" on public.louryx_bundles;
+create policy "ver combos louryx" on public.louryx_bundles for select
+  using (active or public.louryx_is_admin());
+drop policy if exists "admin combos louryx" on public.louryx_bundles;
+create policy "admin combos louryx" on public.louryx_bundles for all to authenticated
+  using (public.louryx_is_admin()) with check (public.louryx_is_admin());
+
+drop policy if exists "ver ajustes louryx" on public.louryx_settings;
+create policy "ver ajustes louryx" on public.louryx_settings for select using (true);
+drop policy if exists "admin ajustes louryx" on public.louryx_settings;
+create policy "admin ajustes louryx" on public.louryx_settings for all to authenticated
   using (public.louryx_is_admin()) with check (public.louryx_is_admin());
 
 -- La tabla louryx_admins no se lee ni se cambia desde la página (solo la usa louryx_is_admin())

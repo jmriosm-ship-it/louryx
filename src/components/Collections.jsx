@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCatalog } from '../context/CatalogContext'
 import { asset } from '../config'
@@ -12,12 +13,24 @@ const COVERS = {
 
 export default function Collections() {
   const { products, categories, categoryPhotos } = useCatalog()
+  // Una foto vertical o cuadrada (un frasco) se muestra entera y a un lado; una foto ancha llena todo el panel
+  const [tall, setTall] = useState({})
+  const key = categories.map((c) => categoryPhotos[c] || '').join('|')
+  useEffect(() => {
+    categories.forEach((c) => {
+      const url = categoryPhotos[c]
+      if (!url) return
+      const img = new Image()
+      img.onload = () => setTall((t) => ({ ...t, [url]: img.naturalHeight >= img.naturalWidth * 0.85 }))
+      img.src = url
+    })
+  }, [key])
   return (
     <div className="col-row">
       {categories.map((c, i) => {
         const cover = categoryPhotos[c] || COVERS[c]
         return (
-          <Link key={c} to={`/catalogo?cat=${encodeURIComponent(c)}`} className={`col-panel ${cover ? 'has-img' : ''}`} style={cover ? { '--img': `url(${asset(cover)})` } : undefined}>
+          <Link key={c} to={`/catalogo?cat=${encodeURIComponent(c)}`} className={`col-panel ${cover ? 'has-img' : ''} ${tall[cover] ? 'is-bottle' : ''}`} style={cover ? { '--img': `url(${asset(cover)})` } : undefined}>
             <span className="col-n">{String(i + 1).padStart(2, '0')}</span>
             <span className="col-plus" aria-hidden="true">+</span>
             <i className="col-line" aria-hidden="true" />

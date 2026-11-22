@@ -6,9 +6,9 @@ export function About() {
   return (
     <section className="section container prose">
       <p className="eyebrow">Nosotros</p>
-      <h1 className="h2">Perfumería con alma</h1>
-      <p className="lead">En Louryx creemos que un perfume es la firma invisible de cada persona. Seleccionamos fragancias con ingredientes nobles, buena proyección y larga duración.</p>
-      <p>Nacimos para que comprar un perfume sea fácil, cercano y sin complicaciones: eliges en el catálogo, nos escribes y te lo llevamos hasta la puerta de tu casa.</p>
+      <h1 className="about-title">Tu personalidad merece una esencia única.</h1>
+      <p className="lead">En LOURYX creemos que un perfume va más allá de un aroma: es parte de tu identidad, refleja tu personalidad y deja una impresión que permanece.</p>
+      <p>Por eso, seleccionamos cuidadosamente referencias que destacan por su proyección, fijación y distinción. Perfumes para quienes buscan marcar presencia, expresar su estilo y encontrar una esencia que los represente.</p>
       <div className="values">
         <div><h4>Calidad</h4><p>Fragancias elegidas por su desempeño real.</p></div>
         <div><h4>Cercanía</h4><p>Te asesoramos personalmente por WhatsApp.</p></div>

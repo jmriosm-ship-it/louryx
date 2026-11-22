@@ -5,15 +5,15 @@ import Collections from '../components/Collections'
 import HowToBuy from '../components/HowToBuy'
 import Recommender from '../components/Recommender'
 import Benefits from '../components/Benefits'
+import ProductCard from '../components/ProductCard'
+import { BundleGrid, useBundles } from './Bundles'
+import { Timer } from './Flash'
+import { useFlash } from '../lib/flash'
 import { useCatalog } from '../context/CatalogContext'
 import { STORE, money, asset } from '../config'
 
-// Perfumes nuevos: los marcados con `nuevo: true` en products.js (el más reciente primero).
-// Si no hay ninguno marcado, se usan los últimos agregados al catálogo.
-const newest = (products) => {
-  const flagged = products.filter((p) => p.nuevo).reverse()
-  return (flagged.length ? flagged : products.slice(-4).reverse()).slice(0, 6)
-}
+// Portada: solo los perfumes marcados como "Nuevo" en el panel (el más reciente primero). Si no hay ninguno, la portada sale sin perfume.
+const newest = (products) => products.filter((p) => p.nuevo).reverse().slice(0, 6)
 
 function HeroSlide({ p, className }) {
   const out = className.includes('out')
@@ -56,10 +56,13 @@ export default function Home() {
   const outClass = view.dir > 0 ? 'out-l' : 'out-r'
   const prev = slides[(i - 1 + n) % n]
   const next = slides[(i + 1) % n]
-  // Más vendidos: los marcados con `vendido: true` en products.js (el primero es el grande).
-  const sold = products.filter((p) => p.vendido)
-  const featured = (sold.length >= 5 ? sold : sold.concat(products.filter((p) => !p.vendido))).slice(0, 5)
+  // Más vendidos: solo los marcados como "Más vendido" en el panel (el primero es el grande).
+  const featured = products.filter((p) => p.vendido).slice(0, 5)
   const [star, ...rest] = featured
+  const flash = useFlash()
+  const deals = flash.deals.slice(0, 4)
+  const hasCombos = useBundles('combo').length > 0
+  const hasKits = useBundles('kit').length > 0
 
   return (
     <>
@@ -77,7 +80,7 @@ export default function Home() {
             <g className="t1"><polygon points="150,10 290,250 10,250" strokeWidth="1.2" /></g>
             <g className="t2"><polygon points="150,250 40,60 260,60" strokeWidth="1" /></g>
           </svg>
-          {n > 1 && (
+          {n > 2 && (
             <button key={prev.id} className="hero-side l" onClick={() => go(-1)} aria-label={`Anterior: ${prev.name}`}>
               <Bottle product={prev} className="hs-img" />
               <span>{prev.name}</span>
@@ -85,7 +88,15 @@ export default function Home() {
           )}
           <div className="hero-slides">
             {leaving && <HeroSlide key={`out-${leaving.id}`} p={leaving} className={outClass} />}
-            <HeroSlide key={cur.id} p={cur} className={inClass} />
+            {cur ? <HeroSlide key={cur.id} p={cur} className={inClass} /> : (
+              <div className="hero-center">
+                <h1>LOURYX</h1>
+                <p className="hc-price">{products.length ? 'Perfumes originales y decants' : 'Muy pronto, nuevos perfumes'}</p>
+                <div className="hero-cta">
+                  {products.length ? <Link to="/catalogo" className="btn">Ver catálogo</Link> : <a className="btn" href={`https://wa.me/${STORE.whatsapp}`} target="_blank" rel="noreferrer">Escríbenos por WhatsApp</a>}
+                </div>
+              </div>
+            )}
           </div>
           {n > 1 && (
             <button key={next.id} className="hero-side r" onClick={() => go(1)} aria-label={`Siguiente: ${next.name}`}>
@@ -132,6 +143,7 @@ export default function Home() {
         <Collections />
       </section>
 
+      {star && (
       <section className="section container">
         <div className="section-head">
           <div><p className="eyebrow">Selección</p><h2 className="display">Más vendidos</h2></div>
@@ -158,6 +170,41 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
+
+      {hasCombos && (
+        <section className="section container">
+          <div className="section-head">
+            <div><p className="eyebrow">Para revender</p><h2 className="display">Combos emprendedores</h2></div>
+            <Link to="/combos" className="link">Ver todos →</Link>
+          </div>
+          <BundleGrid type="combo" limit={3} />
+        </section>
+      )}
+
+      {flash.on && (
+        <section className="section container flash">
+          <div className="section-head flash-head">
+            <div><p className="eyebrow">Oferta relámpago</p><h2 className="display">Se acaba pronto</h2></div>
+            <Timer end={flash.end} />
+          </div>
+          {deals.length > 0 ? (
+            <div className="grid">{deals.map((p) => <ProductCard key={p.id} product={p} />)}</div>
+          ) : (
+            <p className="muted">Estamos preparando los perfumes de esta oferta. Vuelve en un rato o mira el <Link to="/catalogo" className="link">catálogo</Link>.</p>
+          )}
+        </section>
+      )}
+
+      {hasKits && (
+        <section className="section container">
+          <div className="section-head">
+            <div><p className="eyebrow">Para probar y regalar</p><h2 className="display">Kits</h2></div>
+            <Link to="/kits" className="link">Ver todos →</Link>
+          </div>
+          <BundleGrid type="kit" limit={3} />
+        </section>
+      )}
 
       <HowToBuy />
       <Recommender />
