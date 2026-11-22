@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { STORE, asset, money } from '../config'
+import { STORE, asset, money, wholesalePercentFor, wholesalePrice } from '../config'
+import { byRelevance, matches, words } from '../lib/searchText'
 import { buildMenuItems } from './menuItems'
 import { useCatalog } from '../context/CatalogContext'
 import { useFlash } from '../lib/flash'
@@ -26,26 +27,31 @@ export default function Header() {
     return () => document.removeEventListener('keydown', onKey)
   }, [])
 
+  // En la página de Mayoristas el buscador trabaja con precios y pedido mayorista
+  const { pathname } = useLocation()
+  const ws = pathname.replace(/\/$/, '').endsWith('/mayoristas')
+  const dest = ws ? '/mayoristas' : '/catalogo'
+
   const search = (e) => {
     e.preventDefault()
-    navigate(`/catalogo?q=${encodeURIComponent(q.trim())}`)
+    navigate(`${dest}?q=${encodeURIComponent(q.trim())}`)
     setMenu(false)
     setFind(false)
   }
 
-  // Sugerencias en vivo: se filtran al escribir, sin tildes ni mayúsculas
-  const norm = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  // Sugerencias en vivo: se filtran al escribir, tolerando tildes y letras parecidas (k/c, z/s)
   const suggestions = useMemo(() => {
-    const words = norm(q).split(/\s+/).filter(Boolean)
-    if (!words.length) return []
+    if (!words(q).length) return []
     return catalog.products
-      .filter((p) => {
-        const hay = norm([p.name, p.family, p.category].join(' '))
-        return words.every((w) => hay.includes(w))
-      })
-      .sort((a, b) => Number(norm(b.name).startsWith(words[0])) - Number(norm(a.name).startsWith(words[0])))
-      .slice(0, 6)
+      .filter((p) => matches(p, q))
+      .sort(byRelevance(q))
+      .slice(0, 12)
   }, [q, catalog.products])
+
+  // En Mayoristas: precio mayorista (desde el mínimo de unidades). Las que no se venden al por mayor
+  // también aparecen, con su precio normal y enlace a su ficha.
+  const wsOk = (p) => ws && p.wholesale !== false
+  const priceOf = (p) => (wsOk(p) ? wholesalePrice(p.originalPrice ?? p.price, wholesalePercentFor(p, STORE.wholesaleFrom)) : p.price)
 
   const closeSearch = () => {
     setFind(false)
@@ -140,13 +146,13 @@ export default function Header() {
                 <ul className="suggest" role="listbox" aria-label="Sugerencias">
                   {suggestions.map((p) => (
                     <li key={p.id} role="option">
-                      <Link to={`/perfume/${p.id}`} onClick={closeSearch}>
+                      <Link to={wsOk(p) ? `/mayoristas?q=${encodeURIComponent(p.name)}` : `/perfume/${p.id}`} onClick={closeSearch}>
                         {p.image ? <img src={asset(p.image)} alt="" loading="lazy" /> : <span className="suggest__ph" aria-hidden="true" />}
                         <span className="suggest__txt">
                           <b>{p.name}</b>
                           <small>{p.category} · {p.family}</small>
                         </span>
-                        <span className="suggest__price">{money(p.price)}</span>
+                        <span className="suggest__price">{money(priceOf(p))}{ws && <small>{wsOk(p) ? 'mayorista' : 'solo al detal'}</small>}</span>
                       </Link>
                     </li>
                   ))}

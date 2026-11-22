@@ -447,7 +447,8 @@ img.ws-img { mix-blend-mode: screen; }
 .suggest__txt { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .suggest__txt b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .suggest__txt small { color: #8a8a8a; font-size: 0.78rem; }
-.suggest__price { font-size: 0.9rem; white-space: nowrap; }
+.suggest__price { font-size: 0.9rem; white-space: nowrap; text-align: right; }
+.suggest__price small { display: block; font-size: 0.68rem; color: #8a8a8a; letter-spacing: 0.06em; text-transform: uppercase; }
 .suggest__empty { padding: 14px 10px; color: #8a8a8a; }
 .suggest__all { width: 100%; text-align: left; padding: 12px 10px; color: var(--gold); font-size: 0.85rem; border-top: 1px solid var(--line); margin-top: 4px; }
 .suggest__all:hover { background: var(--bg-2); }
