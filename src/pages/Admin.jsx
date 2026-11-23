@@ -250,7 +250,7 @@ function Panel() {
         const p = byName[slug(f.name.replace(/.[^.]+$/, '').replace(/-d+$/, ''))] || byName[slug(f.name.replace(/.[^.]+$/, ''))]
         if (!p) { missing.push(f.name); continue }
         setMsg(`Subiendo fotos… ${i + 1} de ${files.length}`)
-        const url = await store.uploadImage(f)
+        const url = await store.uploadImage(f, { ai: false })
         await store.saveProduct({ id: p.id, image_url: url })
         if (p.category_id && !catPhoto[p.category_id]) catPhoto[p.category_id] = url
         ok++

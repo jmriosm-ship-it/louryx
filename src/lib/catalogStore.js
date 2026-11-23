@@ -1,6 +1,7 @@
 // Lee y guarda categorías y perfumes. Con claves de Supabase usa la base de datos real;
 // sin ellas usa el navegador (localStorage) para poder probar el panel.
 import { getClient, hasBackend, shrinkImage, uploadImage as uploadRemote } from './supabase'
+import { enhanceFile } from './enhance'
 
 export const isLocal = !hasBackend
 
@@ -150,9 +151,16 @@ export async function saveSettings(patch) {
 }
 
 // Foto del perfume: con base de datos se sube a Supabase; en modo de prueba queda dentro del navegador.
-export async function uploadImage(file) {
-  if (isLocal) return (await shrinkImage(file, 900, 0.8)).dataUrl
-  return uploadRemote(file)
+// Toda foto se mejora sola antes de guardarse (se amplía, se afila y queda en WebP). `ai: false` salta la super-resolución (subidas en lote).
+export async function uploadImage(file, opts = {}) {
+  let f = file
+  try {
+    f = await enhanceFile(file, opts)
+  } catch {
+    f = file // si la mejora falla, se sube la foto tal cual
+  }
+  if (isLocal) return (await shrinkImage(f, 1400, 0.9)).dataUrl
+  return uploadRemote(f)
 }
 
 // ---------- Usuarios (solo con Supabase) ----------

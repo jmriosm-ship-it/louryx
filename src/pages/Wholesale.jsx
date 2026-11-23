@@ -192,12 +192,14 @@ export default function Wholesale() {
             <ul>
               {lines.map((l) => (
                 <li key={l.p.id}>
-                  <span>{l.n} × {l.p.name}{l.ws ? ` ✓ -${l.pct}%` : ''}</span>
-                  <span>{money(l.n * l.unit)}</span>
+                  <span className="ws-line-name">{l.n} × {l.p.name}{l.ws ? ` ✓ -${l.pct}%` : ''}</span>
+                  <span className="ws-line-price">{money(l.n * l.unit)}</span>
+                  <button type="button" className="ws-del" onClick={() => set(l.p.id, 0)} aria-label={`Quitar ${l.p.name} del pedido`}>×</button>
                 </li>
               ))}
             </ul>
           )}
+          {lines.length > 1 && <button type="button" className="ws-clear" onClick={() => { if (window.confirm('¿Vaciar todo el pedido?')) setQty({}) }}>Vaciar pedido</button>}
           {normal > subtotal && <div className="row ws-save"><span>Ahorras</span><span>{money(normal - subtotal)}</span></div>}
           <div className="row"><span>Envío</span><span>Se confirma por WhatsApp</span></div>
           <div className="row total"><span>Total de productos</span><strong>{money(subtotal)}</strong></div>

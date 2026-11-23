@@ -35,7 +35,7 @@ export default function Catalog() {
   return (
     <section className="section container">
       <div className="section-head">
-        <div><p className="eyebrow">Tienda</p><h1 className="h2">Catálogo</h1></div>
+        <div><p className="eyebrow">Tienda</p><h1 className="h2 display">Catálogo</h1></div>
         <span className="muted">{list.length} resultado{list.length !== 1 && 's'}</span>
       </div>
 
