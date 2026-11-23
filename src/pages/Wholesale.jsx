@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
+import { matches } from '../lib/searchText'
 import Bottle from '../components/Bottle'
 import PaymentMethods from '../components/PaymentMethods'
 import CarrierPicker from '../components/CarrierPicker'
@@ -39,6 +40,9 @@ export default function Wholesale() {
     return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', esc) }
   }, [bagOpen])
   const [cat, setCat] = useState('Todos')
+  // Búsqueda desde el buscador del encabezado: /mayoristas?q=vulcan
+  const [params, setParams] = useSearchParams()
+  const q = params.get('q') || ''
 
   useEffect(() => {
     try {
@@ -72,7 +76,7 @@ export default function Wholesale() {
   const normal = lines.reduce((s, l) => s + l.n * base(l.p), 0)
   const on = (k) => (e) => setF({ ...f, [k]: e.target.value })
   const cats = ['Todos', ...categories]
-  const list = products.filter((p) => cat === 'Todos' || p.category === cat)
+  const list = products.filter((p) => (cat === 'Todos' || p.category === cat) && matches(p, q))
 
   const submit = (e) => {
     e.preventDefault()
@@ -131,6 +135,12 @@ export default function Wholesale() {
               Mi pedido{units > 0 && <b>{units}</b>}
             </button>
           </div>
+          {q && (
+            <p className="muted">
+              Resultados para “{q}” · <button type="button" className="link" onClick={() => setParams({}, { replace: true })}>ver todos</button>
+            </p>
+          )}
+          {list.length === 0 && <p className="empty">No encontramos perfumes con esa búsqueda.</p>}
           <ul className="ws-list">
             {list.map((p) => {
               const n = qty[p.id] || 0

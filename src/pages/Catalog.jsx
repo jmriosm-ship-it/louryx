@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
 import { useCatalog } from '../context/CatalogContext'
+import { matches } from '../lib/searchText'
 
 const SORTS = {
   destacados: ['Destacados', () => 0],
@@ -25,10 +26,9 @@ export default function Catalog() {
   }
 
   const list = useMemo(() => {
-    const term = q.toLowerCase()
     return products
       .filter((p) => (!cat || p.category === cat) && (!fam || p.family === fam))
-      .filter((p) => !term || [p.name, p.family, p.category, ...Object.values(p.notes).flat()].join(' ').toLowerCase().includes(term))
+      .filter((p) => matches(p, q))
       .sort((SORTS[sort] || SORTS.destacados)[1])
   }, [products, cat, fam, q, sort])
 
