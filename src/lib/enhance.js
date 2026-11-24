@@ -61,6 +61,56 @@ function sharpen(canvas, amount = 0.55) {
   g.putImageData(img, 0, 0)
 }
 
+// Quita el fondo blanco que queda atrapado dentro del asa o del aro de un frasco (hueco blanco rodeado de color, arriba y hacia un lado).
+// Es prudente: solo toca manchas blancas parejas, de tamaño medio, cuadradas y ubicadas en la parte alta y en los costados;
+// una etiqueta blanca en el centro del frasco no se toca.
+function clearEnclosedWhite(canvas) {
+  const w = canvas.width, h = canvas.height
+  const g = canvas.getContext('2d', { willReadFrequently: true })
+  const img = g.getImageData(0, 0, w, h)
+  const d = img.data
+  let minX = w, maxX = -1, minY = h, maxY = -1
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 40) { if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y }
+  if (maxX < 0) return
+  const bw = maxX - minX + 1, bh = maxY - minY + 1
+  const white = new Uint8Array(w * h)
+  for (let p = 0; p < w * h; p++) white[p] = d[p * 4 + 3] > 200 && d[p * 4] > 234 && d[p * 4 + 1] > 234 && d[p * 4 + 2] > 234 ? 1 : 0
+  const seen = new Uint8Array(w * h)
+  for (let s0 = 0; s0 < w * h; s0++) {
+    if (!white[s0] || seen[s0]) continue
+    const comp = [s0]
+    seen[s0] = 1
+    let colored = 0, trans = 0, x0 = w, x1 = -1, y0 = h, y1 = -1
+    for (let k = 0; k < comp.length; k++) {
+      const p = comp[k], x = p % w, y = (p / w) | 0
+      if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, ny = y + dy
+        if (nx < 0 || ny < 0 || nx >= w || ny >= h) { trans++; continue }
+        const q = ny * w + nx
+        if (white[q]) { if (!seen[q]) { seen[q] = 1; comp.push(q) } } else if (d[q * 4 + 3] < 120) trans++
+        else colored++
+      }
+    }
+    const area = comp.length, per = colored + trans
+    const cw = x1 - x0 + 1, ch = y1 - y0 + 1
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2
+    const top = (cy - minY) / bh < 0.45
+    const side = Math.abs((cx - minX) / bw - 0.5) > 0.2
+    if (area > bw * bh * 0.006 && area < bw * bh * 0.07 && area / (cw * ch) > 0.72 && per && colored / per > 0.7 && trans / per < 0.25 && top && side) {
+      for (const p of comp) d[p * 4 + 3] = 0
+      for (const p of comp) { // un píxel más alrededor, para que no quede un borde claro
+        const x = p % w, y = (p / w) | 0
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          const nx = x + dx, ny = y + dy
+          if (nx >= 0 && ny >= 0 && nx < w && ny < h) { const q = (ny * w + nx) * 4; if (d[q] > 215 && d[q + 1] > 215 && d[q + 2] > 215) d[q + 3] = 0 }
+        }
+      }
+    }
+  }
+  g.putImageData(img, 0, 0)
+}
+
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, no) => setTimeout(() => no(new Error('tardó demasiado')), ms))])
 
 // Devuelve un File ya mejorado (WebP). `onStep` recibe un texto para mostrar el avance.
@@ -75,6 +125,7 @@ export async function enhanceFile(file, { ai = true, onStep } = {}) {
 
   const base = canvasOf(bitmap.width, bitmap.height)
   base.getContext('2d').drawImage(bitmap, 0, 0)
+  if (hasAlphaType) clearEnclosedWhite(base)
   let work = base
 
   if (ai && scale > 1.4 && bitmap.height < AI_BELOW) {

@@ -5,6 +5,7 @@ import App from './App'
 import { CartProvider } from './context/CartContext'
 import { CatalogProvider } from './context/CatalogContext'
 import './styles.css'
+import './theme-light.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import * as store from '../lib/catalogStore'
 import { cutoutFile } from '../lib/cutout'
+import { enhanceFile } from '../lib/enhance'
 import { parseCsv, rowToProduct, templateCsv } from '../lib/csvImport'
 import { useCatalog } from '../context/CatalogContext'
 import { products as EXAMPLE_PRODUCTS, CATEGORIES as EXAMPLE_CATEGORIES, FAMILIES } from '../data/products'
@@ -301,6 +302,33 @@ function Panel() {
     }
   }
 
+  // Vuelve a pasar por el mejorador las fotos que se subieron a mano (recorte del fondo, hueco blanco del asa, ampliación con IA y nitidez)
+  const improveUploaded = async () => {
+    const todo = data.products.filter((p) => p.image_url && /^https?:/.test(p.image_url))
+    if (!todo.length) { setMsg('No hay fotos subidas a mano para mejorar.'); return }
+    if (!window.confirm(`Se van a mejorar ${todo.length} fotos (recorte, nitidez y calidad con IA). Puede tardar varios minutos: no cierres ni cambies de pestaña. ¿Continuar?`)) return
+    setImporting(true)
+    setMsg('')
+    let ok = 0
+    const failed = []
+    for (const [i, p] of todo.entries()) {
+      setMsg(`Mejorando fotos… ${i + 1} de ${todo.length}`)
+      try {
+        const blob = await (await fetch(p.image_url)).blob()
+        let f = new File([blob], 'foto.' + (blob.type.includes('png') ? 'png' : 'jpg'), { type: blob.type || 'image/png' })
+        try { f = await cutoutFile(f) } catch { /* si el fondo no es parejo, se deja como está */ }
+        const better = await enhanceFile(f, { ai: true })
+        const url = await store.uploadImage(better, { raw: true })
+        await store.saveProduct({ id: p.id, image_url: url })
+        ok++
+      } catch (err) {
+        failed.push(p.name)
+      }
+    }
+    await done(`Listo: ${ok} fotos mejoradas.${failed.length ? ` No se pudieron mejorar ${failed.length}: ${failed.slice(0, 4).join(', ')}.` : ''}`)
+    setImporting(false)
+  }
+
   const shown = prods.filter((p) => !filter || p.category_id === filter)
 
   return (
@@ -346,6 +374,7 @@ function Panel() {
                   <button type="button" className="lxp-link" disabled={importing} onClick={() => csvRef.current?.click()}>{importing ? 'Subiendo…' : 'Subir archivo'}</button>
                   <button type="button" className="lxp-link" disabled={importing} onClick={() => photosRef.current?.click()}>Subir fotos (varias)</button>
                   <button type="button" className="lxp-link" disabled={importing} onClick={autoPhotos}>Poner fotos del catálogo (automático)</button>
+                  <button type="button" className="lxp-link" disabled={importing} onClick={improveUploaded}>Mejorar las fotos que subí a mano (IA)</button>
                 </span>
                 <input ref={csvRef} type="file" accept=".csv,text/csv" hidden onChange={importFile} />
                 <input ref={photosRef} type="file" accept="image/*" multiple hidden onChange={importPhotos} />

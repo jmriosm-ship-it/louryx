@@ -154,10 +154,12 @@ export async function saveSettings(patch) {
 // Toda foto se mejora sola antes de guardarse (se amplía, se afila y queda en WebP). `ai: false` salta la super-resolución (subidas en lote).
 export async function uploadImage(file, opts = {}) {
   let f = file
-  try {
-    f = await enhanceFile(file, opts)
-  } catch {
-    f = file // si la mejora falla, se sube la foto tal cual
+  if (!opts.raw) {
+    try {
+      f = await enhanceFile(file, opts)
+    } catch {
+      f = file // si la mejora falla, se sube la foto tal cual
+    }
   }
   if (isLocal) return (await shrinkImage(f, 1400, 0.9)).dataUrl
   return uploadRemote(f)
