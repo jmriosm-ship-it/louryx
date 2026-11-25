@@ -144,7 +144,7 @@ export default function Wholesale() {
           <ul className="ws-list">
             {list.map((p) => {
               const n = qty[p.id] || 0
-              const pct = wholesalePercentFor(p, min)
+              const pct = wholesalePercentFor(p, Math.max(units, min))
               const nowPct = wholesalePercentFor(p, Math.max(units, min))
               const next = nextWholesaleTier(Math.max(units, min))
               return (
@@ -155,7 +155,11 @@ export default function Wholesale() {
                     <small>{p.category} · {p.size} ml</small>
                     <span className="ws-price">
                       <b>{money(wholesalePrice(base(p), pct))}</b> <s>{money(base(p))}</s>
-                      <em className="ws-tag">-{pct}% desde {min}</em>
+                      <span className="ws-tiers">
+                        {STORE.wholesaleTiers.map((t) => (
+                          <em key={t} className={`ws-tag ${units >= t && STORE.wholesaleTiers.filter((x) => x <= units).pop() === t ? 'on' : ''}`}>-{wholesalePercentFor(p, t)}% desde {t}</em>
+                        ))}
+                      </span>
                     </span>
                     {n > 0 && !soldOut(p) && (
                       <small className={`ws-hint ${ready ? 'ok' : ''}`}>

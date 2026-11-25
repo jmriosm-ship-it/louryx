@@ -836,3 +836,14 @@ img.detail-bottle { width: auto; max-width: 68%; max-height: 400px; object-fit: 
 .bundle-art .bundle-bottle:only-child { max-width: 90%; height: 100%; margin: 0; }
 .bundle-art .bundle-bottle:first-child:nth-last-child(2), .bundle-art .bundle-bottle:nth-child(2):last-child { max-width: 46%; }
 @media (max-width: 640px) { .bundle-art { height: 300px; } }
+
+/* Mayoristas: escalones de cada perfume; el que está aplicando ahora se resalta */
+.ws-tiers { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.ws-tiers .ws-tag { margin-left: 0; border-color: #444; color: #8a8a8a; }
+.ws-tiers .ws-tag.on { border-color: #fff; background: #fff; color: #000; }
+
+/* Kits y combos: tarjetas más anchas y foto más alta */
+.bundles { grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); }
+.bundle-art { height: 380px; }
+.bundle h3 { font-size: 1.8rem; }
+@media (max-width: 640px) { .bundle-art { height: 360px; } }
