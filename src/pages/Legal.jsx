@@ -147,7 +147,7 @@ export function Terms() {
 
       <h2>5. Compras al por mayor</h2>
       <p>
-        Desde {STORE.wholesaleFrom} unidades de un mismo perfume, ese perfume tiene su precio mayorista, sin límite de cantidad. El descuento mayorista de cada perfume se muestra en la página
+        Desde {STORE.wholesaleFrom} unidades en total, pueden ser de un mismo perfume o de varios distintos, cada perfume del pedido tiene su precio mayorista, sin límite de cantidad. Al llegar a {STORE.wholesaleTiers[1]} y a {STORE.wholesaleTiers[2]} unidades en total, el descuento aumenta. El descuento mayorista de cada perfume se muestra en la página
         de <Link to="/mayoristas">Mayoristas</Link>. Un perfume agotado no se puede pedir por esa vía.
       </p>
 

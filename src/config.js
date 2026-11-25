@@ -28,7 +28,7 @@ export const STORE = {
   // Para cambiar el descuento, pon el porcentaje aquí en decimal (0.15 = 15%, 0.2 = 20%): se aplica solo en toda la tienda.
   wholesaleFrom: 3,
   wholesaleDiscount: 0.15,
-  // Escalones por cantidad de UN MISMO perfume (el primero es wholesaleFrom). El descuento de cada escalón
+  // Escalones por cantidad TOTAL de unidades del pedido, mezclando perfumes (el primero es wholesaleFrom). El descuento de cada escalón
   // se pone por perfume en el panel (pestaña Mayoristas). Si un escalón queda vacío, ese perfume mantiene el descuento del anterior.
   wholesaleTiers: [3, 12, 30],
   // Marcas de la cinta de la portada: deja solo las que vendes.

@@ -830,3 +830,9 @@ img.detail-bottle { width: auto; max-width: 68%; max-height: 400px; object-fit: 
 @media (max-width: 800px) { .fl-cols { grid-template-columns: 1fr; } }
 .fl-left { display: grid; gap: 32px; min-width: 0; }
 .fl-cols:has(.fl-left:only-child) { grid-template-columns: 1fr; }
+
+/* Combos y kits: foto más grande (un kit con una sola foto ocupa casi todo el recuadro) */
+.bundle-art { height: 260px; }
+.bundle-art .bundle-bottle:only-child { max-width: 90%; height: 100%; margin: 0; }
+.bundle-art .bundle-bottle:first-child:nth-last-child(2), .bundle-art .bundle-bottle:nth-child(2):last-child { max-width: 46%; }
+@media (max-width: 640px) { .bundle-art { height: 300px; } }

@@ -67,10 +67,10 @@ export default function Wholesale() {
   const lines = useMemo(
     () => picked.map((p) => {
       const n = qty[p.id]
-      const pct = ready ? wholesalePercentFor(p, Math.max(n, min)) : 0
+      const pct = ready ? wholesalePercentFor(p, Math.max(units, min)) : 0
       return { p, n, pct, ws: ready, unit: ready ? wholesalePrice(base(p), pct) : base(p) }
     }),
-    [picked, qty, ready],
+    [picked, qty, ready, units],
   )
   const subtotal = lines.reduce((s, l) => s + l.n * l.unit, 0)
   const normal = lines.reduce((s, l) => s + l.n * base(l.p), 0)
@@ -145,8 +145,8 @@ export default function Wholesale() {
             {list.map((p) => {
               const n = qty[p.id] || 0
               const pct = wholesalePercentFor(p, min)
-              const nowPct = wholesalePercentFor(p, Math.max(n, min))
-              const next = nextWholesaleTier(Math.max(n, min))
+              const nowPct = wholesalePercentFor(p, Math.max(units, min))
+              const next = nextWholesaleTier(Math.max(units, min))
               return (
                 <li key={p.id} className={`${n ? 'has' : ''} ${soldOut(p) ? 'out' : ''}`}>
                   <span className="ws-media"><Bottle product={p} className="ws-img" /></span>
@@ -160,7 +160,7 @@ export default function Wholesale() {
                     {n > 0 && !soldOut(p) && (
                       <small className={`ws-hint ${ready ? 'ok' : ''}`}>
                         {ready ? `✓ Precio mayorista aplicado (-${nowPct}%)` : `${min - units === 1 ? 'Falta 1 unidad' : 'Faltan ' + (min - units) + ' unidades'} en total para el precio mayorista`}
-                        {ready && next && wholesalePercentFor(p, next.from) > nowPct ?` · agrega ${next.from - n} más de este y baja a ${money(wholesalePrice(base(p), wholesalePercentFor(p, next.from)))} c/u` : ''}
+                        {ready && next && wholesalePercentFor(p, next.from) > nowPct ?` · agrega ${next.from - units} más en total y baja a ${money(wholesalePrice(base(p), wholesalePercentFor(p, next.from)))} c/u` : ''}
                       </small>
                     )}
                   </span>

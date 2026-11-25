@@ -487,7 +487,7 @@ function Panel() {
             <>
               <p className="lxp-help">
                 Aquí decides, para cada perfume, si se vende al por mayor y el descuento de cada escalón: desde {STORE.wholesaleTiers[0]}, desde {STORE.wholesaleTiers[1]} y desde {STORE.wholesaleTiers[2]} unidades
-                de ese mismo perfume. Se aplica solo en la página de Mayoristas; en la tienda normal el precio no cambia.
+                en total del pedido, mezclando perfumes (por ejemplo, con 15 perfumes cualquiera se aplica el de “desde {STORE.wholesaleTiers[1]}”). Se aplica solo en la página de Mayoristas; en la tienda normal el precio no cambia.
                 Si dejas el primero vacío, se usa el general ({Math.round(STORE.wholesaleDiscount * 100)}%); un escalón vacío repite el anterior.
               </p>
               {data.products.length > 0 && <WholesaleBulk onApply={applyWholesaleToAll} />}
