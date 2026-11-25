@@ -4,7 +4,7 @@
 // `vendido: true` hace que aparezca en "Más vendidos" del inicio (se muestran 5; el primero va grande).
 // `nuevo: true` hace que el perfume aparezca en el carrusel de la portada (el último agregado sale primero).
 export const CATEGORIES = ['Mujer', 'Hombre', 'Unisex']
-export const FAMILIES = ['Floral', 'Amaderado', 'Oriental', 'Cítrico', 'Gourmand', 'Fresco']
+export const FAMILIES = ['Floral', 'Amaderado', 'Oriental', 'Cítrico', 'Gourmand', 'Fresco', 'Frutal', 'Dulce']
 
 export const products = [
   { id: 'rasasi-hawas-fire', name: 'Hawas Fire', category: 'Hombre', family: 'Fresco', size: 100, price: 190000, tone: '#8a0f1f', accent: '#e8453c', image: '/perfumes/hawas-fire.png', badge: 'Nuevo', nuevo: true, stock: 10,

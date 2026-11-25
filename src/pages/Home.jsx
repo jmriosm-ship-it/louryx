@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Bottle from '../components/Bottle'
 import Collections from '../components/Collections'
@@ -36,6 +36,7 @@ export default function Home() {
   // dir: 1 = entra desde la derecha, -1 = desde la izquierda, 0 = primera carga. from: el que se está yendo.
   const [view, setView] = useState({ i: 0, dir: 0, from: null })
   const [paused, setPaused] = useState(false)
+  const swipe = useRef(null)
   const n = slides.length
   const i = view.i
   const goTo = (to, dir) => setView((v) => (to === v.i ? v : { i: to, dir, from: v.i }))
@@ -74,7 +75,19 @@ export default function Home() {
           <img src={asset('/brand/perfume-lx.jpg')} alt="Perfume Louryx" />
         </div>
       </div>
-      <section className="hero" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+      <section
+        className="hero"
+        style={{ touchAction: 'pan-y' }}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onTouchStart={(e) => { const t = e.touches[0]; swipe.current = { x: t.clientX, y: t.clientY } }}
+        onTouchEnd={(e) => {
+          const s = swipe.current; swipe.current = null
+          if (!s) return
+          const t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y
+          if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) go(dx < 0 ? 1 : -1)
+        }}
+      >
         <div className="container hero-stage">
           <svg className="hero-tri" viewBox="0 0 300 260" aria-hidden="true">
             <g className="t1"><polygon points="150,10 290,250 10,250" strokeWidth="1.2" /></g>

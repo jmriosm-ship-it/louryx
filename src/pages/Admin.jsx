@@ -360,6 +360,7 @@ function Panel() {
             <button type="button" className={tab === 'categorias' ? 'on' : ''} onClick={() => { setTab('categorias'); setMsg('') }}>Categorías ({data.categories.length})</button>
             <button type="button" className={tab === 'mayoristas' ? 'on' : ''} onClick={() => { setTab('mayoristas'); setMsg('') }}>Mayoristas ({data.products.filter((p) => p.wholesale).length})</button>
             <button type="button" className={tab === 'ofertas' ? 'on' : ''} onClick={() => { setTab('ofertas'); setMsg('') }}>Ofertas ({data.bundles.length})</button>
+            <button type="button" className={tab === 'relampago' ? 'on' : ''} onClick={() => { setTab('relampago'); setMsg('') }}>Oferta relámpago ({data.products.filter((p) => Number(p.discount_percent) > 0).length})</button>
           </nav>
 
           {loading && <p>Cargando…</p>}
@@ -452,6 +453,24 @@ function Panel() {
                 {cats.length === 0 && <li className="lxp-empty">Todavía no hay categorías. Crea la primera con “Nueva categoría”.</li>}
               </ul>
             </>
+          )}
+
+          {!loading && tab === 'relampago' && (
+            <FlashTab
+              data={data}
+              onSettings={(patch) => attempt(() => store.saveSettings(patch), 'Guardado')}
+              onSetDiscount={(id, pct) => attempt(() => store.saveProduct({ id, discount_percent: pct }), pct ? 'Descuento guardado' : 'Quitado de la oferta')}
+              onCreate={async (pct, ml, kind) => {
+                let cat = ''
+                if (kind === 'tester') {
+                  cat = data.categories.find((c) => /^testers?$/i.test(String(c.name).trim()))?.id
+                  if (!cat) { try { cat = (await store.saveCategory({ name: 'Testers', sort: data.categories.length, active: true })).id } catch (e) { setMsg(`No se pudo crear la categoría Testers: ${e.message || 'error'}`); return } }
+                }
+                newProduct(cat)
+                setEditing((e) => ({ ...e, data: { ...e.data, discount: String(pct), size_ml: ml } }))
+                setTab('perfumes')
+              }}
+            />
           )}
 
           {!loading && tab === 'ofertas' && (
@@ -566,18 +585,19 @@ const toInput = (iso) => {
 }
 const fmt = (ms) => new Date(ms).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' })
 
-// Pestaña Ofertas: opciones fijas del menú (Combos, Oferta relámpago, Kits), la oferta relámpago y los combos y kits
-function OffersTab({ data, onSettings, onNew, onEdit, onDelete }) {
+// Pestaña Oferta relámpago: encender/apagar y hora de fin, y escoger qué perfumes están en oferta (con su descuento)
+function FlashTab({ data, onSettings, onSetDiscount, onCreate }) {
   const st = data.settings || {}
-  const covers = st.covers || {}
   const active = st.flash_active !== false
   const [ends, setEnds] = useState(toInput(st.flash_ends_at))
   const endMs = st.flash_ends_at ? new Date(st.flash_ends_at).getTime() : null
   const over = endMs !== null && endMs <= Date.now()
-  const deals = data.products.filter((p) => p.active && Number(p.discount_percent) > 0 && Number(p.stock) > 0).length
+  const testerIds = new Set((data.categories || []).filter(isTesterCat).map((c) => c.id))
+  const inOffer = data.products.filter((p) => Number(p.discount_percent) > 0)
+  const deals = inOffer.filter((p) => p.active && Number(p.stock) > 0).length
   const status = !active ? 'Apagada: no se ve en la tienda.'
     : over ? 'Ya terminó: se quitó sola de la tienda. Ponle una hora nueva para volver a mostrarla.'
-      : deals === 0 ? 'Activa y visible, pero ningún perfume tiene descuento todavía: la tienda muestra el aviso “estamos preparando las ofertas”. Ponle “Descuento %” a un perfume para que aparezca.'
+      : deals === 0 ? 'Activa y visible, pero todavía no hay perfumes en oferta: la tienda muestra el aviso “estamos preparando las ofertas”. Agrega perfumes abajo.'
         : endMs ? `Activa hasta el ${fmt(endMs)}. Después se quita sola.` : 'Activa: termina cada día a las 11:59 pm y empieza de nuevo al día siguiente.'
   const setEnd = (date) => {
     setEnds(date ? toInput(date.toISOString()) : '')
@@ -585,16 +605,11 @@ function OffersTab({ data, onSettings, onNew, onEdit, onDelete }) {
   }
   const inHours = (h) => new Date(Date.now() + h * 3600 * 1000)
   const todayEnd = () => { const d = new Date(); d.setHours(23, 59, 0, 0); return d }
-  const priceOf = (b) => {
-    const full = (b.items || []).reduce((t, i) => t + (Number(data.products.find((p) => String(p.id) === String(i.id))?.price) || 0) * (Number(i.qty) || 0), 0)
-    return Math.round((full * (1 - (Number(b.discount_percent) || 0) / 100)) / 1000) * 1000
-  }
-  const nameOf = (id) => data.products.find((p) => String(p.id) === String(id))?.name || 'Perfume borrado'
 
   return (
     <>
       <h2 className="lxp-h2">Oferta relámpago</h2>
-      <p className="lxp-help">Muestra los perfumes que tengan “Descuento %” puesto. Aparece en el menú, en el inicio y en su página mientras esté activa, y cuando llega la hora de fin se quita sola.</p>
+      <p className="lxp-help">Aparece en el menú, en el inicio y en su página mientras esté activa, y cuando llega la hora de fin se quita sola.</p>
       <div className="lxp-box">
         <label className="lxp-check lxp-check--card">
           <input type="checkbox" checked={active} onChange={(e) => onSettings({ flash_active: e.target.checked })} />
@@ -617,6 +632,84 @@ function OffersTab({ data, onSettings, onNew, onEdit, onDelete }) {
         </div>
       </div>
 
+      <OfferList title="Perfumes en oferta" kind="perfume" items={data.products.filter((p) => !isDecant(p) && !testerIds.has(p.category_id))} onSetDiscount={onSetDiscount} onCreate={onCreate} />
+      <OfferList title="Decants en oferta" kind="decant" items={data.products.filter((p) => isDecant(p) && !testerIds.has(p.category_id))} onSetDiscount={onSetDiscount} onCreate={onCreate} />
+      <OfferList title="Testers en oferta" kind="tester" items={data.products.filter((p) => testerIds.has(p.category_id))} onSetDiscount={onSetDiscount} onCreate={onCreate} />
+    </>
+  )
+}
+
+// Un decant es una porción chica (5, 10 ml…); lo demás es frasco completo
+const isDecant = (p) => Number(p.size_ml) > 0 && Number(p.size_ml) <= 30
+const isTesterCat = (c) => /^testers?$/i.test(String(c?.name || '').trim())
+
+function OfferList({ title, kind, items, onSetDiscount, onCreate }) {
+  const [pick, setPick] = useState('')
+  const [pct, setPct] = useState('20')
+  const clamp = (v) => Math.min(90, Math.max(1, Math.round(Number(v) || 0)))
+  const inOffer = items.filter((p) => Number(p.discount_percent) > 0)
+  const free = items.filter((p) => !(Number(p.discount_percent) > 0)).sort((a, b) => String(a.name).localeCompare(String(b.name)))
+  const word = kind === 'decant' ? 'decant' : kind === 'tester' ? 'tester' : 'perfume'
+  return (
+    <>
+      <h2 className="lxp-h2">{title} ({inOffer.length})</h2>
+      <p className="lxp-help">Escoge un {word} que ya tengas y ponle el descuento, o crea uno nuevo directamente con descuento.</p>
+      <div className="lxp-box">
+        <div className="lxp-row">
+          <label>{kind === 'decant' ? 'Decant' : kind === 'tester' ? 'Tester' : 'Perfume'}
+            <select value={pick} onChange={(e) => setPick(e.target.value)}>
+              <option value="">Escoge un {word}…</option>
+              {free.map((p) => <option key={p.id} value={p.id}>{p.name}{kind === 'decant' ? ` (${p.size_ml} ml)` : ''}</option>)}
+            </select>
+          </label>
+          <label>Descuento (%)
+            <input type="number" min="1" max="90" step="1" value={pct} onChange={(e) => setPct(e.target.value)} />
+          </label>
+          <button type="button" className="lxp-btn lxp-btn--solid" disabled={!pick || !(Number(pct) > 0)} onClick={() => { onSetDiscount(pick, clamp(pct)); setPick('') }}>Agregar a la oferta</button>
+        </div>
+        <div className="lxp-quick">
+          <button type="button" className="lxp-btn lxp-btn--solid" onClick={() => onCreate(clamp(pct), kind === 'decant' ? 10 : 100, kind)}>+ Crear {word} nuevo con descuento</button>
+        </div>
+      </div>
+      <ul className="lxp-list">
+        {inOffer.map((p) => (
+          <li key={p.id} className={p.active ? '' : 'off'}>
+            <Thumb src={p.image_url} />
+            <span className="lxp-list__info">
+              <strong>{p.name}{kind === 'decant' ? ` · ${p.size_ml} ml` : ''}</strong>
+              <small>{money(Number(p.price) || 0)} → {money(Math.round((Number(p.price) || 0) * (1 - Number(p.discount_percent) / 100)))}</small>
+              <small>
+                {!p.active && <span className="lxp-badge lxp-badge--out">Oculto</span>}
+                {(Number(p.stock) || 0) <= 0 && <span className="lxp-badge lxp-badge--out">Agotado: no sale en la oferta</span>}
+              </small>
+              <small className="lxp-stock">
+                Descuento:
+                <button type="button" aria-label="Bajar descuento" onClick={() => onSetDiscount(p.id, clamp(Number(p.discount_percent) - 5))}>−</button>
+                <b>{p.discount_percent}%</b>
+                <button type="button" aria-label="Subir descuento" onClick={() => onSetDiscount(p.id, clamp(Number(p.discount_percent) + 5))}>+</button>
+              </small>
+            </span>
+            <button type="button" onClick={() => onSetDiscount(p.id, null)}>Quitar de la oferta</button>
+          </li>
+        ))}
+        {inOffer.length === 0 && <li className="lxp-empty">Todavía no hay {word}s en oferta.</li>}
+      </ul>
+    </>
+  )
+}
+
+// Pestaña Ofertas: opciones fijas del menú (Combos, Oferta relámpago, Kits) y los combos y kits
+function OffersTab({ data, onSettings, onNew, onEdit, onDelete }) {
+  const st = data.settings || {}
+  const covers = st.covers || {}
+  const priceOf = (b) => {
+    const full = (b.items || []).reduce((t, i) => t + (Number(data.products.find((p) => String(p.id) === String(i.id))?.price) || 0) * (Number(i.qty) || 0), 0)
+    return Math.round((full * (1 - (Number(b.discount_percent) || 0) / 100)) / 1000) * 1000
+  }
+  const nameOf = (id) => data.products.find((p) => String(p.id) === String(id))?.name || 'Perfume borrado'
+
+  return (
+    <>
       <h2 className="lxp-h2">Opciones fijas del menú</h2>
       <p className="lxp-help">Son las tres opciones de ofertas del menú “Colección”. Aquí cambias la foto que sale al pasar el mouse. Si no subes una, usan la de Louryx.</p>
       <ul className="lxp-list lxp-list--cats">
@@ -628,7 +721,6 @@ function OffersTab({ data, onSettings, onNew, onEdit, onDelete }) {
           </li>
         ))}
       </ul>
-
       <h2 className="lxp-h2">Combos y kits</h2>
       <p className="lxp-help">
         Cada combo o kit junta varios perfumes con un descuento extra. El precio se calcula solo con los precios de los perfumes.

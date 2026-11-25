@@ -3,7 +3,7 @@ import Bottle from './Bottle'
 import { useCart } from '../context/CartContext'
 import { money, soldOut } from '../config'
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, hideMeta = false }) {
   const { add } = useCart()
   const out = soldOut(product)
   return (
@@ -16,9 +16,9 @@ export default function ProductCard({ product }) {
         <Bottle product={product} className="card-bottle" />
       </Link>
       <div className="card-body">
-        <p className="eyebrow">{product.category} · {product.family}</p>
+        {!hideMeta && <p className="eyebrow">{product.category} · {product.family}</p>}
         <h3><Link to={`/perfume/${product.id}`}>{product.name}</Link></h3>
-        <p className="muted">{product.size} ml · Eau de Parfum</p>
+        {!hideMeta && <p className="muted">{product.size} ml · Eau de Parfum</p>}
         <div className="card-foot">
           <span className="price-box">
             {product.discount > 0 && <s>{money(product.originalPrice)}</s>}
