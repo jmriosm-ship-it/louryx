@@ -81,6 +81,7 @@ export default function App() {
       )}
       {!inAdmin && <Header />}
       <main>
+        {!inAdmin && pathname !== '/' && <div className="container back-row"><BackButton /></div>}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalogo" element={<Catalog />} />
