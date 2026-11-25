@@ -857,3 +857,9 @@ img.detail-bottle { width: auto; max-width: 68%; max-height: 400px; object-fit: 
 .fl-grid .card-foot { flex-wrap: wrap; gap: 10px; }
 .fl-grid .card-body { padding: 18px 22px 22px; }
 @media (max-width: 800px) { .fl-grid .card-foot { flex-direction: row; align-items: center; } }
+
+/* Botón para volver atrás */
+.back-btn { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 4px 0; margin: 0 0 14px; color: var(--muted); font: inherit; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: color 0.2s, gap 0.2s; }
+.back-btn:hover, .back-btn:focus-visible { color: var(--text); gap: 12px; }
+.back-row { padding-top: 22px; }
+.back-row + * .section, .back-row ~ .section { padding-top: 12px; }

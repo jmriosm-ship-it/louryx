@@ -42,7 +42,6 @@ export default function Product() {
           )}
         </div>
         <div className="detail-info">
-          <Link to="/catalogo" className="link">← Catálogo</Link>
           <p className="eyebrow">{p.category} · {p.family}</p>
           <h1>{p.name}</h1>
           <p className="price">

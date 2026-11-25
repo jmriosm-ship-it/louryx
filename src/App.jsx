@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { STORE } from './config'
 import Header from './components/Header'
+import BackButton from './components/BackButton'
 import Footer from './components/Footer'
 import CartDrawer from './components/CartDrawer'
 import WhatsAppButton from './components/WhatsAppButton'
@@ -65,7 +66,8 @@ function ScrollReveal() {
 
 export default function App() {
   // El panel de administración va solo, sin el encabezado ni los botones de la tienda
-  const inAdmin = useLocation().pathname.startsWith('/admin')
+  const { pathname } = useLocation()
+  const inAdmin = pathname.startsWith('/admin')
   return (
     <>
       <ScrollTop />
