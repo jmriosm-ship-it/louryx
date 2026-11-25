@@ -7,7 +7,7 @@ import Recommender from '../components/Recommender'
 import Benefits from '../components/Benefits'
 import ProductCard from '../components/ProductCard'
 import { BundleGrid, useBundles } from './Bundles'
-import { Timer } from './Flash'
+import { Timer, FlashDeals } from './Flash'
 import { useFlash } from '../lib/flash'
 import { useCatalog } from '../context/CatalogContext'
 import { STORE, money, asset } from '../config'
@@ -202,7 +202,7 @@ export default function Home() {
             <Timer end={flash.end} />
           </div>
           {deals.length > 0 ? (
-            <div className="grid">{deals.map((p) => <ProductCard key={p.id} product={p} />)}</div>
+            <FlashDeals deals={deals} />
           ) : (
             <p className="muted">Estamos preparando los perfumes de esta oferta. Vuelve en un rato o mira el <Link to="/catalogo" className="link">catálogo</Link>.</p>
           )}

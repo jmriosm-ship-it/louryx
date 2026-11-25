@@ -45,22 +45,12 @@ function DecantRow({ p }) {
   )
 }
 
-export default function Flash() {
-  const { on, end, deals } = useFlash()
+// Perfumes y testers en tarjetas grandes; decants en lista al lado (se usa en la página de la oferta y en el inicio)
+export function FlashDeals({ deals }) {
   const testers = deals.filter(isTester)
   const full = deals.filter((p) => !isDecant(p) && !isTester(p))
   const decants = deals.filter(isDecant)
-
   return (
-    <section className="section container flash">
-      <div className="section-head flash-head">
-        <div>
-          <p className="eyebrow">Oferta relámpago</p>
-          <h1 className="h2 display">{on ? 'Se acaba pronto' : 'Esta oferta terminó'}</h1>
-        </div>
-        {on && <Timer end={end} />}
-      </div>
-      {on && deals.length > 0 ? (
         <div className="fl-cols">
           {(full.length > 0 || testers.length > 0) && <div className="fl-left">
           {full.length > 0 && (
@@ -83,6 +73,22 @@ export default function Flash() {
             </div>
           )}
         </div>
+  )
+}
+
+export default function Flash() {
+  const { on, end, deals } = useFlash()
+  return (
+    <section className="section container flash">
+      <div className="section-head flash-head">
+        <div>
+          <p className="eyebrow">Oferta relámpago</p>
+          <h1 className="h2 display">{on ? 'Se acaba pronto' : 'Esta oferta terminó'}</h1>
+        </div>
+        {on && <Timer end={end} />}
+      </div>
+      {on && deals.length > 0 ? (
+        <FlashDeals deals={deals} />
       ) : on ? (
         <p className="muted">Estamos preparando los perfumes de esta oferta. Vuelve en un rato o mira el <Link to="/catalogo" className="link">catálogo</Link>.</p>
       ) : (

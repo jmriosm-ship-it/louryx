@@ -847,3 +847,13 @@ img.detail-bottle { width: auto; max-width: 68%; max-height: 400px; object-fit: 
 .bundle-art { height: 380px; }
 .bundle h3 { font-size: 1.8rem; }
 @media (max-width: 640px) { .bundle-art { height: 360px; } }
+
+/* Oferta relámpago: foto del perfume más grande */
+.fl-grid .card-media { min-height: 400px; }
+.fl-grid img.card-bottle { max-width: 90%; max-height: 350px; }
+
+/* Oferta relámpago: tarjetas más anchas */
+.fl-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+.fl-grid .card-foot { flex-wrap: wrap; gap: 10px; }
+.fl-grid .card-body { padding: 18px 22px 22px; }
+@media (max-width: 800px) { .fl-grid .card-foot { flex-direction: row; align-items: center; } }
