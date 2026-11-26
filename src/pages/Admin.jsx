@@ -82,6 +82,7 @@ function Panel() {
   const [tab, setTab] = useState('perfumes')
   const [editing, setEditing] = useState(null) // { kind: 'product' | 'category', data }
   const [filter, setFilter] = useState('')
+  const [q, setQ] = useState('')
   const [msg, setMsg] = useState('')
   const [importing, setImporting] = useState(false)
   const csvRef = useRef(null)
@@ -329,7 +330,8 @@ function Panel() {
     setImporting(false)
   }
 
-  const shown = prods.filter((p) => !filter || p.category_id === filter)
+  const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  const shown = prods.filter((p) => (!filter || p.category_id === filter) && (!q.trim() || norm(p.name).includes(norm(q.trim()))))
 
   return (
     <>
@@ -380,6 +382,9 @@ function Panel() {
                 <input ref={csvRef} type="file" accept=".csv,text/csv" hidden onChange={importFile} />
                 <input ref={photosRef} type="file" accept="image/*" multiple hidden onChange={importPhotos} />
               </div>
+              <label className="lxp-filter">Buscar perfume
+                <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Escribe el nombre…" />
+              </label>
               {data.categories.length > 1 && (
                 <label className="lxp-filter">Categoría
                   <select value={filter} onChange={(e) => setFilter(e.target.value)}>
@@ -428,7 +433,7 @@ function Panel() {
                       <button type="button" onClick={() => removeProduct(p)}>Borrar</button>
                     </li>
                   ))}
-                  {shown.length === 0 && <li className="lxp-empty">Esta categoría todavía no tiene perfumes.</li>}
+                  {shown.length === 0 && <li className="lxp-empty">No hay perfumes que coincidan.</li>}
                 </ul>
               )}
             </>
