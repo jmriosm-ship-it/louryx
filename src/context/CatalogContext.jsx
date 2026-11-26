@@ -2,8 +2,13 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { products as STATIC, CATEGORIES as STATIC_CATS, FAMILIES } from '../data/products'
 import { BUNDLES as STATIC_BUNDLES } from '../data/bundles'
 import { listAll } from '../lib/catalogStore'
-import { hasBackend } from '../lib/supabase'
+import { hasBackend, anonKey, proxify } from '../lib/supabase'
 import { STORE } from '../config'
+
+// Si hay proxy de fotos (VITE_IMG_HOST), el mismo Worker entrega el catálogo con una copia de respaldo
+const proxyHost = import.meta.env.VITE_IMG_HOST?.replace(/\/$/, '')
+const COPIA = 'lx-catalogo-copia'
+const VACIO = { products: [], categories: [], bundles: [], settings: {} }
 
 // Catálogo que usa toda la tienda. Si hay perfumes creados en el panel de administración
 // (base de datos o modo de prueba) se usan esos; si no, los de src/data/products.js.
@@ -77,10 +82,38 @@ export function CatalogProvider({ children }) {
   const [loading, setLoading] = useState(hasBackend)
 
   const reload = useCallback(async () => {
+    // 1) Por el Worker de Cloudflare (con caché y copia de respaldo); si falla, 2) directo a Supabase
+    const desdeWorker = async () => {
+      const r = await fetch(`${proxyHost}/catalogo?k=${encodeURIComponent(anonKey)}`)
+      if (!r.ok) throw new Error('worker')
+      return r.json()
+    }
     try {
-      setState(build(await listAll()))
+      let raw
+      try {
+        raw = hasBackend && proxyHost ? await desdeWorker() : await listAll()
+      } catch {
+        raw = await listAll()
+      }
+      if (hasBackend) {
+        try {
+          localStorage.setItem(COPIA, JSON.stringify(raw))
+        } catch {
+          /* sin espacio o sin permiso: no pasa nada */
+        }
+      }
+      setState(build(proxify(raw)))
     } catch {
-      setState(build(hasBackend ? { products: [], categories: [], bundles: [], settings: {} } : null))
+      // Último recurso (solo con base de datos): la última copia buena que este navegador alcanzó a guardar
+      let copia = null
+      if (hasBackend) {
+        try {
+          copia = JSON.parse(localStorage.getItem(COPIA))
+        } catch {
+          /* sin copia */
+        }
+      }
+      setState(build(hasBackend ? (copia?.products?.length ? proxify(copia) : VACIO) : null))
     } finally {
       setLoading(false)
     }

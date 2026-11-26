@@ -5,6 +5,16 @@ const url = import.meta.env.VITE_SUPABASE_URL
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const hasBackend = Boolean(url && key)
+export const anonKey = key
+
+// Las fotos de la tienda pueden salir por un proxy con caché de Cloudflare (workers/img-proxy.js)
+// para no gastar el tráfico de Supabase. Se activa con VITE_IMG_HOST (ej. https://img.louryxcol.com.co);
+// sin esa variable las fotos se piden directo a Supabase, como antes.
+const imgHost = import.meta.env.VITE_IMG_HOST?.replace(/\/$/, '')
+const storagePrefix = url ? `${url}/storage/v1/object/public/` : ''
+export const imgUrl = (u) => (imgHost && storagePrefix && typeof u === 'string' && u.startsWith(storagePrefix) ? `${imgHost}/${u.slice(storagePrefix.length)}` : u)
+// Cambia todas las direcciones de fotos de Supabase que haya dentro de un objeto. Solo para mostrar: no toca la base de datos.
+export const proxify = (data) => (imgHost && storagePrefix ? JSON.parse(JSON.stringify(data).split(storagePrefix).join(`${imgHost}/`)) : data)
 
 let client
 // La librería se carga solo cuando hay claves, para no pesar en una tienda sin base de datos.

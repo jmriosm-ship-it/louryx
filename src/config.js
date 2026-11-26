@@ -1,6 +1,9 @@
+import { imgUrl } from './lib/supabase'
+
 // Datos de la tienda: cambia aquí el WhatsApp, redes y contacto.
 // Rutas de /public que respetan la base del sitio (GitHub Pages sirve en /louryx/).
-export const asset = (p) => (p && p.startsWith('/') ? import.meta.env.BASE_URL + p.slice(1) : p)
+// Las fotos que viven en Supabase salen por el proxy de Cloudflare si está activo (ver imgUrl).
+export const asset = (p) => imgUrl(p && p.startsWith('/') ? import.meta.env.BASE_URL + p.slice(1) : p)
 
 // Un perfume sin cantidad disponible se muestra como Agotado y no se puede comprar.
 export const soldOut = (p) => Number(p?.stock ?? 1) <= 0
