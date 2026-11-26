@@ -718,7 +718,7 @@ function OffersTab({ data, onSettings, onNew, onEdit, onDelete }) {
       <h2 className="lxp-h2">Opciones fijas del menú</h2>
       <p className="lxp-help">Son las tres opciones de ofertas del menú “Colección”. Aquí cambias la foto que sale al pasar el mouse. Si no subes una, usan la de Louryx.</p>
       <ul className="lxp-list lxp-list--cats">
-        {[['combo', 'Combos emprendedores', '/combos'], ['flash', 'Oferta relámpago', '/oferta-relampago'], ['kit', 'Kits', '/kits']].map(([key, title, to]) => (
+        {[['combo', 'Combos emprendedores', '/combos'], ['flash', 'Oferta relámpago', '/oferta-relampago'], ['kit', 'Sets', '/kits']].map(([key, title, to]) => (
           <li key={key}>
             <Thumb src={covers[key]} />
             <span className="lxp-list__info"><strong>{title}</strong><small>{to}</small></span>
@@ -726,19 +726,19 @@ function OffersTab({ data, onSettings, onNew, onEdit, onDelete }) {
           </li>
         ))}
       </ul>
-      <h2 className="lxp-h2">Combos y kits</h2>
+      <h2 className="lxp-h2">Combos y sets</h2>
       <p className="lxp-help">
-        Cada combo o kit junta varios perfumes con un descuento extra. El precio se calcula solo con los precios de los perfumes.
+        Cada combo o set junta varios perfumes con un descuento extra. El precio se calcula solo con los precios de los perfumes.
         {data.bundles.length === 0 && ' Todavía no has creado ninguno: la tienda muestra unos de ejemplo hasta que crees el primero.'}
       </p>
       <div className="lxp-quick">
         <button type="button" className="lxp-btn lxp-btn--solid" onClick={() => onNew('combo')}>+ Nuevo combo</button>
-        <button type="button" className="lxp-btn lxp-btn--solid" onClick={() => onNew('kit')}>+ Nuevo kit</button>
+        <button type="button" className="lxp-btn lxp-btn--solid" onClick={() => onNew('kit')}>+ Nuevo set</button>
       </div>
       <ul className="lxp-list">
         {data.bundles.map((b) => (
           <li key={b.id} className={b.active === false ? 'off' : ''}>
-            <span className="lxp-thumb-empty">{b.type === 'kit' ? 'Kit' : 'Combo'}</span>
+            <span className="lxp-thumb-empty">{b.type === 'kit' ? 'Set' : 'Combo'}</span>
             <span className="lxp-list__info">
               <strong>{b.name}</strong>
               <small>{(b.items || []).map((i) => `${i.qty} × ${nameOf(i.id)}`).join(' · ') || 'Sin perfumes'}</small>
@@ -785,10 +785,10 @@ function BundleForm({ initial, products, onSaved, onCancel }) {
 
   return (
     <form className="lxp-form" onSubmit={submit}>
-      <h2>{f.id ? 'Editar' : 'Nuevo'} {kind === 'kit' ? 'kit' : 'combo'}</h2>
+      <h2>{f.id ? 'Editar' : 'Nuevo'} {kind === 'kit' ? 'set' : 'combo'}</h2>
       <div className="lxp-row">
         <label>Tipo
-          <select {...bind('type')}><option value="combo">Combo emprendedor</option><option value="kit">Kit</option></select>
+          <select {...bind('type')}><option value="combo">Combo emprendedor</option><option value="kit">Set</option></select>
         </label>
         <label>Nombre<input required autoFocus {...bind('name')} /></label>
       </div>

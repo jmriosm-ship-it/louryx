@@ -5,7 +5,7 @@ import { money, soldOut, STORE } from '../config'
 
 const TEXT = {
   combo: { eyebrow: 'Para revender', title: 'Combos emprendedores', lead: 'Varios perfumes juntos con descuento extra, pensados para empezar a vender o surtir tu negocio.' },
-  kit: { eyebrow: 'Para probar y regalar', title: 'Kits', lead: 'Sets de perfumes ya armados, con descuento, listos para regalar o para descubrir tu próximo aroma.' },
+  kit: { eyebrow: 'Para probar y regalar', title: 'Sets', lead: 'Sets de perfumes ya armados, con descuento, listos para regalar o para descubrir tu próximo aroma.' },
 }
 
 // Precio del combo: suma de los perfumes (a su precio normal) menos el descuento, redondeado a miles
@@ -22,7 +22,7 @@ function BundleCard({ b, items }) {
     '',
     ...items.map((it) => `• ${it.qty} x ${it.p.name} (${it.p.size} ml)`),
     '',
-    `Precio del ${b.type === 'kit' ? 'kit' : 'combo'}: ${money(price)}${b.off > 0 ? ` (${b.off}% menos)` : ''}`,
+    `Precio del ${b.type === 'kit' ? 'set' : 'combo'}: ${money(price)}${b.off > 0 ? ` (${b.off}% menos)` : ''}`,
     'Envío: se confirma por WhatsApp',
   ].join('\n')
   return (
@@ -61,7 +61,7 @@ export function BundleGrid({ type, limit }) {
   return list.length ? (
     <div className="bundles">{list.map(({ b, items }) => <BundleCard key={b.id} b={b} items={items} />)}</div>
   ) : (
-    <p className="muted">Pronto tendremos {type === 'kit' ? 'kits' : 'combos'} disponibles. Mientras tanto mira el <Link to="/catalogo" className="link">catálogo</Link>.</p>
+    <p className="muted">Pronto tendremos {type === 'kit' ? 'sets' : 'combos'} disponibles. Mientras tanto mira el <Link to="/catalogo" className="link">catálogo</Link>.</p>
   )
 }
 

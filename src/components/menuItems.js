@@ -35,6 +35,6 @@ export function buildMenuItems({ products, categories, families, categoryPhotos 
     // La oferta relámpago solo aparece mientras está activa (encendida, con hora vigente y con perfumes en descuento).
     { title: 'Combos emprendedores', to: '/combos', img: covers.combo || '/brand/local-louryx.jpg', fit: 'cover', label: `${bundles.filter((b) => b.type === 'combo').length} combos` },
     flashOn && { title: '⚡ Oferta relámpago', to: '/oferta-relampago', img: covers.flash || FALLBACK, fit: 'cover', label: products.some((p) => p.discount > 0) ? `${products.filter((p) => p.discount > 0).length} en oferta` : 'Muy pronto' },
-    { title: 'Kits', to: '/kits', img: covers.kit || '/brand/perfume-lx.jpg', fit: covers.kit ? 'cover' : 'contain', label: `${bundles.filter((b) => b.type === 'kit').length} kits` },
+    { title: 'Sets', to: '/kits', img: covers.kit || '/brand/perfume-lx.jpg', fit: covers.kit ? 'cover' : 'contain', label: `${bundles.filter((b) => b.type === 'kit').length} sets` },
   ].filter(Boolean)
 }

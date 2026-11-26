@@ -212,7 +212,7 @@ export default function Home() {
       {hasKits && (
         <section className="section container">
           <div className="section-head">
-            <div><p className="eyebrow">Para probar y regalar</p><h2 className="display">Kits</h2></div>
+            <div><p className="eyebrow">Para probar y regalar</p><h2 className="display">Sets</h2></div>
             <Link to="/kits" className="link">Ver todos →</Link>
           </div>
           <BundleGrid type="kit" limit={3} />
