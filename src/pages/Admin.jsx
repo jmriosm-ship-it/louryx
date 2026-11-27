@@ -363,6 +363,7 @@ function Panel() {
             <button type="button" className={tab === 'mayoristas' ? 'on' : ''} onClick={() => { setTab('mayoristas'); setMsg('') }}>Mayoristas ({data.products.filter((p) => p.wholesale).length})</button>
             <button type="button" className={tab === 'ofertas' ? 'on' : ''} onClick={() => { setTab('ofertas'); setMsg('') }}>Ofertas ({data.bundles.length})</button>
             <button type="button" className={tab === 'relampago' ? 'on' : ''} onClick={() => { setTab('relampago'); setMsg('') }}>Oferta relámpago ({data.products.filter((p) => Number(p.discount_percent) > 0).length})</button>
+            <button type="button" className={tab === 'blackfriday' ? 'on' : ''} onClick={() => { setTab('blackfriday'); setMsg('') }}>Black Friday ({Array.isArray(data.settings?.bf_items) ? data.settings.bf_items.length : 0})</button>
           </nav>
 
           {loading && <p>Cargando…</p>}
@@ -476,6 +477,10 @@ function Panel() {
                 setTab('perfumes')
               }}
             />
+          )}
+
+          {!loading && tab === 'blackfriday' && (
+            <BlackFridayTab data={data} onSettings={(patch) => attempt(() => store.saveSettings(patch), 'Guardado')} />
           )}
 
           {!loading && tab === 'ofertas' && (
@@ -640,6 +645,98 @@ function FlashTab({ data, onSettings, onSetDiscount, onCreate }) {
       <OfferList title="Perfumes en oferta" kind="perfume" items={data.products.filter((p) => !isDecant(p) && !testerIds.has(p.category_id))} onSetDiscount={onSetDiscount} onCreate={onCreate} />
       <OfferList title="Decants en oferta" kind="decant" items={data.products.filter((p) => isDecant(p) && !testerIds.has(p.category_id))} onSetDiscount={onSetDiscount} onCreate={onCreate} />
       <OfferList title="Testers en oferta" kind="tester" items={data.products.filter((p) => testerIds.has(p.category_id))} onSetDiscount={onSetDiscount} onCreate={onCreate} />
+    </>
+  )
+}
+
+// Pestaña Black Friday: encender/apagar, hora de fin opcional, y escoger los perfumes con su descuento propio (no toca el descuento de la oferta relámpago)
+function BlackFridayTab({ data, onSettings }) {
+  const st = data.settings || {}
+  const active = st.bf_active === true
+  const items = Array.isArray(st.bf_items) ? st.bf_items : []
+  const [ends, setEnds] = useState(toInput(st.bf_ends_at))
+  const [pick, setPick] = useState('')
+  const [pct, setPct] = useState('30')
+  const clamp = (v) => Math.min(90, Math.max(1, Math.round(Number(v) || 0)))
+  const endMs = st.bf_ends_at ? new Date(st.bf_ends_at).getTime() : null
+  const over = endMs !== null && endMs <= Date.now()
+  const byId = new Map(data.products.map((p) => [String(p.id), p]))
+  const listed = items.map((i) => ({ ...i, p: byId.get(String(i.id)) })).filter((i) => i.p)
+  const free = data.products.filter((p) => !items.some((i) => String(i.id) === String(p.id))).sort((a, b) => String(a.name).localeCompare(String(b.name)))
+  const setItems = (next) => onSettings({ bf_items: next })
+  const setPct1 = (id, v) => setItems(items.map((i) => (String(i.id) === String(id) ? { ...i, pct: clamp(v) } : i)))
+  const status = !active ? 'Apagado: no se ve en la tienda.'
+    : over ? 'Ya terminó: se quitó solo de la tienda. Ponle una hora nueva para volver a mostrarlo.'
+      : listed.length === 0 ? 'Activo, pero todavía no hay perfumes: agrégalos abajo.'
+        : endMs ? `Activo hasta el ${fmt(endMs)}. Después se quita solo.` : 'Activo sin hora de fin: se queda hasta que lo apagues.'
+  const inHours = (h) => new Date(Date.now() + h * 3600 * 1000)
+  const todayEnd = () => { const d = new Date(); d.setHours(23, 59, 0, 0); return d }
+  const setEnd = (date) => {
+    setEnds(date ? toInput(date.toISOString()) : '')
+    onSettings({ bf_active: true, bf_ends_at: date ? date.toISOString() : null })
+  }
+  return (
+    <>
+      <h2 className="lxp-h2">Black Friday</h2>
+      <p className="lxp-help">Aparece en el menú (debajo de Sets), en el inicio y en su propia página mientras esté activo. Cada perfume lleva su descuento y el precio ya sale rebajado en toda la tienda.</p>
+      <div className="lxp-box">
+        <label className="lxp-check lxp-check--card">
+          <input type="checkbox" checked={active} onChange={(e) => onSettings({ bf_active: e.target.checked })} />
+          <span><b>Mostrar el Black Friday en la tienda</b><small className="lxp-help">{status}</small></span>
+        </label>
+        <div className="lxp-row">
+          <label>Termina el día y la hora (opcional)
+            <input type="datetime-local" value={ends} onChange={(e) => setEnds(e.target.value)} />
+          </label>
+          <button type="button" className="lxp-btn lxp-btn--solid" disabled={!ends} onClick={() => setEnd(new Date(ends))}>Guardar hora</button>
+        </div>
+        <div className="lxp-quick">
+          <span>Atajos:</span>
+          <button type="button" className="lxp-btn" onClick={() => setEnd(todayEnd())}>Hasta hoy 11:59 pm</button>
+          <button type="button" className="lxp-btn" onClick={() => setEnd(inHours(24))}>24 horas</button>
+          <button type="button" className="lxp-btn" onClick={() => setEnd(inHours(72))}>3 días</button>
+          <button type="button" className="lxp-btn" onClick={() => setEnd(null)}>Sin hora de fin</button>
+        </div>
+      </div>
+
+      <h2 className="lxp-h2">Perfumes en Black Friday ({listed.length})</h2>
+      <div className="lxp-box">
+        <div className="lxp-row">
+          <label>Perfume
+            <select value={pick} onChange={(e) => setPick(e.target.value)}>
+              <option value="">Escoge un perfume…</option>
+              {free.map((p) => <option key={p.id} value={p.id}>{p.name}{isDecant(p) ? ` (${p.size_ml} ml)` : ''}</option>)}
+            </select>
+          </label>
+          <label>Descuento (%)
+            <input type="number" min="1" max="90" step="1" value={pct} onChange={(e) => setPct(e.target.value)} />
+          </label>
+          <button type="button" className="lxp-btn lxp-btn--solid" disabled={!pick || !(Number(pct) > 0)} onClick={() => { setItems([...items, { id: String(pick), pct: clamp(pct) }]); setPick('') }}>Agregar al Black Friday</button>
+        </div>
+      </div>
+      <ul className="lxp-list">
+        {listed.map(({ id, pct: d, p }) => (
+          <li key={id} className={p.active ? '' : 'off'}>
+            <Thumb src={p.image_url} />
+            <span className="lxp-list__info">
+              <strong>{p.name}{isDecant(p) ? ` · ${p.size_ml} ml` : ''}</strong>
+              <small>{money(Number(p.price) || 0)} → {money(Math.round((Number(p.price) || 0) * (1 - d / 100) / 100) * 100)}</small>
+              <small>
+                {!p.active && <span className="lxp-badge lxp-badge--out">Oculto</span>}
+                {(Number(p.stock) || 0) <= 0 && <span className="lxp-badge lxp-badge--out">Agotado: no sale</span>}
+              </small>
+              <small className="lxp-stock">
+                Descuento:
+                <button type="button" aria-label="Bajar descuento" onClick={() => setPct1(id, Number(d) - 5)}>−</button>
+                <b>{d}%</b>
+                <button type="button" aria-label="Subir descuento" onClick={() => setPct1(id, Number(d) + 5)}>+</button>
+              </small>
+            </span>
+            <button type="button" onClick={() => setItems(items.filter((i) => String(i.id) !== String(id)))}>Quitar</button>
+          </li>
+        ))}
+        {listed.length === 0 && <li className="lxp-empty">Todavía no hay perfumes en el Black Friday.</li>}
+      </ul>
     </>
   )
 }

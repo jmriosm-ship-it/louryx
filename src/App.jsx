@@ -13,6 +13,7 @@ import Checkout from './pages/Checkout'
 import Wholesale from './pages/Wholesale'
 import Bundles from './pages/Bundles'
 import Flash from './pages/Flash'
+import BlackFriday from './pages/BlackFriday'
 import Admin from './pages/Admin'
 import { Privacy, Terms, Shipping } from './pages/Legal'
 import { About, Contact, NotFound } from './pages/Info'
@@ -91,6 +92,7 @@ export default function App() {
           <Route path="/combos" element={<Bundles type="combo" />} />
           <Route path="/kits" element={<Bundles type="kit" />} />
           <Route path="/oferta-relampago" element={<Flash />} />
+          <Route path="/black-friday" element={<BlackFriday />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/privacidad" element={<Privacy />} />
           <Route path="/terminos" element={<Terms />} />

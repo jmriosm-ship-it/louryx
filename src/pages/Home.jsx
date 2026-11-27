@@ -9,6 +9,8 @@ import ProductCard from '../components/ProductCard'
 import { BundleGrid, useBundles } from './Bundles'
 import { Timer, FlashDeals } from './Flash'
 import { useFlash } from '../lib/flash'
+import { useBlackFriday } from '../lib/blackfriday'
+import { BlackFridayDeals } from './BlackFriday'
 import { useCatalog } from '../context/CatalogContext'
 import { STORE, money, asset } from '../config'
 
@@ -61,6 +63,7 @@ export default function Home() {
   const featured = products.filter((p) => p.vendido).slice(0, 5)
   const [star, ...rest] = featured
   const flash = useFlash()
+  const bf = useBlackFriday()
   const deals = flash.deals.slice(0, 4)
   const hasCombos = useBundles('combo').length > 0
   const hasKits = useBundles('kit').length > 0
@@ -216,6 +219,17 @@ export default function Home() {
             <Link to="/kits" className="link">Ver todos →</Link>
           </div>
           <BundleGrid type="kit" limit={3} />
+        </section>
+      )}
+
+      {bf.on && bf.deals.length > 0 && (
+        <section className="section container flash">
+          <div className="section-head flash-head">
+            <div><p className="eyebrow">Solo por tiempo limitado</p><h2 className="display">Black Friday</h2></div>
+            {bf.end && <Timer end={bf.end} />}
+          </div>
+          <BlackFridayDeals deals={bf.deals.slice(0, 6)} />
+          <p style={{ marginTop: 18 }}><Link to="/black-friday" className="link">Ver todo el Black Friday →</Link></p>
         </section>
       )}
 

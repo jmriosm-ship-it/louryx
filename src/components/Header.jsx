@@ -6,6 +6,7 @@ import { byRelevance, matches, words } from '../lib/searchText'
 import { buildMenuItems } from './menuItems'
 import { useCatalog } from '../context/CatalogContext'
 import { useFlash } from '../lib/flash'
+import { useBlackFriday } from '../lib/blackfriday'
 
 export default function Header() {
   const { count, setOpen } = useCart()
@@ -18,7 +19,8 @@ export default function Header() {
   const navigate = useNavigate()
   const catalog = useCatalog()
   const { on: flashOn } = useFlash()
-  const items = useMemo(() => buildMenuItems({ ...catalog, flashOn }), [catalog, flashOn])
+  const { on: bfOn } = useBlackFriday()
+  const items = useMemo(() => buildMenuItems({ ...catalog, flashOn, bfOn }), [catalog, flashOn, bfOn])
   const current = items[preview]
 
   useEffect(() => {

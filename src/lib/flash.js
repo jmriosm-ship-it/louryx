@@ -26,6 +26,6 @@ export function useFlash() {
     return () => clearTimeout(t)
   }, [end])
 
-  const deals = products.filter((p) => p.discount > 0 && !soldOut(p)).sort((a, b) => b.discount - a.discount)
+  const deals = products.filter((p) => p.discount > 0 && !p.bf && !soldOut(p)).sort((a, b) => b.discount - a.discount)
   return { on: settings.flashActive && end > Date.now(), end, deals }
 }

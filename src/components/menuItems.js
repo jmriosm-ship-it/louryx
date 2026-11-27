@@ -9,7 +9,7 @@ const COVER = {
 }
 const FALLBACK = '/brand/fondo-louryx.jpg'
 
-export function buildMenuItems({ products, categories, families, categoryPhotos = {}, bundles = [], settings = {}, flashOn = false }) {
+export function buildMenuItems({ products, categories, families, categoryPhotos = {}, bundles = [], settings = {}, flashOn = false, bfOn = false }) {
   const covers = settings.covers || {}
   const firstImage = (match) => products.find((p) => match(p) && p.image)?.image
   const photoItem = (own, byProduct) => {
@@ -34,7 +34,8 @@ export function buildMenuItems({ products, categories, families, categoryPhotos 
     // Opciones fijas de ofertas: llevan a su propia página. La foto se cambia en el panel (pestaña Ofertas).
     // La oferta relámpago solo aparece mientras está activa (encendida, con hora vigente y con perfumes en descuento).
     { title: 'Combos emprendedores', to: '/combos', img: covers.combo || '/brand/local-louryx.jpg', fit: 'cover', label: `${bundles.filter((b) => b.type === 'combo').length} combos` },
-    flashOn && { title: '⚡ Oferta relámpago', to: '/oferta-relampago', img: covers.flash || FALLBACK, fit: 'cover', label: products.some((p) => p.discount > 0) ? `${products.filter((p) => p.discount > 0).length} en oferta` : 'Muy pronto' },
+    flashOn && { title: '⚡ Oferta relámpago', to: '/oferta-relampago', img: covers.flash || FALLBACK, fit: 'cover', label: products.some((p) => p.discount > 0 && !p.bf) ? `${products.filter((p) => p.discount > 0 && !p.bf).length} en oferta` : 'Muy pronto' },
     { title: 'Sets', to: '/kits', img: covers.kit || '/brand/perfume-lx.jpg', fit: covers.kit ? 'cover' : 'contain', label: `${bundles.filter((b) => b.type === 'kit').length} sets` },
+    bfOn && { title: 'Black Friday', to: '/black-friday', img: covers.bf || FALLBACK, fit: 'cover', label: `${products.filter((p) => p.bf).length} en oferta` },
   ].filter(Boolean)
 }

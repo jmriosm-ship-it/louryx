@@ -26,6 +26,9 @@ const settingsOf = (raw) => ({
   flashActive: raw?.settings?.flash_active !== false,
   flashEndsAt: raw?.settings?.flash_ends_at || null,
   covers: raw?.settings?.covers || {},
+  bfActive: raw?.settings?.bf_active === true,
+  bfEndsAt: raw?.settings?.bf_ends_at || null,
+  bfItems: Array.isArray(raw?.settings?.bf_items) ? raw.settings.bf_items : [],
 })
 
 function build(raw) {
@@ -35,12 +38,16 @@ function build(raw) {
   }
   const cats = raw.categories.filter((c) => c.active)
   const byId = new Map(raw.categories.map((c) => [c.id, c]))
+  const st = settingsOf(raw)
+  const bfOn = st.bfActive && (!st.bfEndsAt || new Date(st.bfEndsAt).getTime() > Date.now())
+  const bfMap = new Map(bfOn ? st.bfItems.map((i) => [String(i.id), Number(i.pct) || 0]) : [])
   const products = raw.products
     .filter((p) => p.active)
     .map((row) => {
       // Descuento propio del perfume (se pone al crearlo o editarlo en el panel)
       const base = Number(row.price) || 0
-      const pct = Number(row.discount_percent) || 0
+      const bfPct = bfMap.get(String(row.id)) || 0
+      const pct = bfPct || Number(row.discount_percent) || 0
       return {
       id: String(row.id),
       name: row.name,
@@ -50,6 +57,7 @@ function build(raw) {
       price: pct ? Math.round((base * (1 - pct / 100)) / 100) * 100 : base,
       originalPrice: pct ? base : undefined,
       discount: pct,
+      bf: bfPct > 0,
       image: row.image_url || '',
       photos: [row.image_url, ...(row.photos || [])].filter(Boolean),
       description: row.description || '',
